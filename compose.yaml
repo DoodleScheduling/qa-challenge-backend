@@ -2,6 +2,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
+    restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -12,10 +13,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: kafka
+    restart: unless-stopped
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -36,10 +39,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 45s
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.4.0
     container_name: schema-registry
+    restart: unless-stopped
     depends_on:
       kafka:
         condition: service_healthy
@@ -54,10 +59,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   postgres:
     image: postgres:14-alpine
     container_name: postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
@@ -71,9 +78,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+
   schema-registry-ui:
     image: landoop/schema-registry-ui:latest
     container_name: schema-registry-ui
+    restart: unless-stopped
     ports:
       - "8001:8000"
     environment:
@@ -82,7 +92,12 @@ services:
     depends_on:
       schema-registry:
         condition: service_healthy
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   postgres-data:
