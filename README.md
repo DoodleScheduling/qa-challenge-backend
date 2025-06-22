@@ -95,10 +95,3 @@ View and manage Avro schemas:
 http://localhost:8001
 ```
 
-### Confluent Control Center (Optional)
-
-If using Confluent Platform, access the Control Center at:
-```
-http://localhost:9021
-```
-
