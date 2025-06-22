@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: svc-user-qa-test
+
+  # Database Configuration for Tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  flyway:
+    enabled: false
+
+  # Kafka Configuration for Tests
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        specific.avro.reader: true
+        schema.registry.url: mock://testcontainers
+      group-id: test-consumer-group
+      enable-auto-commit: false
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: mock://testcontainers
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 1
+        retry.backoff.ms: 1000
+      acks: all
+      retries: 3
+
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+
+  retry:
+    kafka:
+      max-attempts: 3
+      initial-interval: 1000
+      multiplier: 2.0
+      max-interval: 10000
+
+# Schema Registry Configuration
+schema-registry:
+  url: mock://testcontainers
+
+# Kafka Topics
+kafka:
+  topics:
+    user-state: user-state-test
+    user-state-dlt: user-state-test.DLT
+
+# Server Configuration
+server:
+  port: 0
+
+# Logging Configuration
+logging:
+  level:
+    doodle.qa.com.svcuserqa: DEBUG
+    org.springframework.kafka: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
