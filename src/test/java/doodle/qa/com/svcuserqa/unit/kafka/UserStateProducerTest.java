@@ -58,16 +58,19 @@ class UserStateProducerTest {
 
     CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
     future.complete(sendResult);
+
+    // Set up argument captors
+    ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<UserState> valueCaptor = ArgumentCaptor.forClass(UserState.class);
+
+    // Mock the send method to return the future and capture arguments
     when(kafkaTemplate.send(anyString(), anyString(), any(UserState.class))).thenReturn(future);
 
     // When
     userStateProducer.sendUserState(user, eventType);
 
     // Then
-    ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<UserState> valueCaptor = ArgumentCaptor.forClass(UserState.class);
-
     verify(kafkaTemplate).send(topicCaptor.capture(), keyCaptor.capture(), valueCaptor.capture());
 
     assertThat(topicCaptor.getValue()).isEqualTo(userStateTopic);
@@ -92,7 +95,10 @@ class UserStateProducerTest {
 
     CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
     future.completeExceptionally(new RuntimeException("Kafka send failed"));
-    when(kafkaTemplate.send(anyString(), anyString(), any(UserState.class))).thenReturn(future);
+
+    // Mock the send method to return the future with exception
+    when(kafkaTemplate.send(eq(userStateTopic), eq(userId.toString()), any(UserState.class)))
+        .thenReturn(future);
 
     // When
     userStateProducer.sendUserState(user, eventType);
@@ -111,7 +117,6 @@ class UserStateProducerTest {
 
     CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
     future.complete(sendResult);
-    when(kafkaTemplate.send(anyString(), anyString(), any(UserState.class))).thenReturn(future);
 
     // Test for each event type
     EventType[] eventTypes = {
@@ -123,21 +128,22 @@ class UserStateProducerTest {
     };
 
     for (EventType eventType : eventTypes) {
+      // Set up argument captor for UserState
+      ArgumentCaptor<UserState> valueCaptor = ArgumentCaptor.forClass(UserState.class);
+
+      // Mock the send method to return the future
+      when(kafkaTemplate.send(eq(userStateTopic), eq(userId.toString()), any(UserState.class)))
+          .thenReturn(future);
+
       // When
       userStateProducer.sendUserState(user, eventType);
 
       // Then
-      ArgumentCaptor<UserState> valueCaptor = ArgumentCaptor.forClass(UserState.class);
-      verify(kafkaTemplate, times(1))
-          .send(eq(userStateTopic), eq(userId.toString()), valueCaptor.capture());
+      verify(kafkaTemplate).send(eq(userStateTopic), eq(userId.toString()), valueCaptor.capture());
       assertThat(valueCaptor.getValue().getEventType()).isEqualTo(eventType);
 
       // Reset mock for next iteration
       reset(kafkaTemplate);
-      // Only stub if not the last iteration
-      if (eventType != EventType.CALENDAR_REMOVED) {
-        when(kafkaTemplate.send(anyString(), anyString(), any(UserState.class))).thenReturn(future);
-      }
     }
   }
 }
