@@ -34,8 +34,8 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Integration tests for Kafka transaction functionality. These tests verify that Kafka messages
- * are correctly handled within transactions.
+ * Integration tests for Kafka transaction functionality. These tests verify that Kafka messages are
+ * correctly handled within transactions.
  */
 @SpringBootTest
 @ActiveProfiles("test")
@@ -43,8 +43,8 @@ import org.springframework.test.context.ActiveProfiles;
     partitions = 1,
     topics = {"user-state-test", "user-state-test.DLT"},
     brokerProperties = {
-        "transaction.state.log.replication.factor=1",
-        "transaction.state.log.min.isr=1"
+      "transaction.state.log.replication.factor=1",
+      "transaction.state.log.min.isr=1"
     })
 class KafkaTransactionTest {
 
@@ -80,7 +80,8 @@ class KafkaTransactionTest {
   @DisplayName("Should not produce Kafka message when database operation fails")
   void testTransactionRollbackOnDatabaseFailure() {
     // Given
-    UserDto userDto = TestDataFactory.createUserDto("Transaction Test User", "transaction-test@example.com");
+    UserDto userDto =
+        TestDataFactory.createUserDto("Transaction Test User", "transaction-test@example.com");
 
     // Mock repository to throw exception after the first save
     Mockito.doThrow(new OptimisticLockingFailureException("Simulated database failure"))
@@ -96,14 +97,17 @@ class KafkaTransactionTest {
     assertThat(records.count()).isEqualTo(0);
 
     // Verify that sendUserState was never called
-    Mockito.verify(userStateProducer, Mockito.never()).sendUserState(Mockito.any(), Mockito.eq(EventType.CREATED));
+    Mockito.verify(userStateProducer, Mockito.never())
+        .sendUserState(Mockito.any(), Mockito.eq(EventType.CREATED));
   }
 
   @Test
   @DisplayName("Should produce Kafka message when database operation succeeds")
   void testTransactionCommitOnDatabaseSuccess() {
     // Given
-    UserDto userDto = TestDataFactory.createUserDto("Transaction Success User", "transaction-success@example.com");
+    UserDto userDto =
+        TestDataFactory.createUserDto(
+            "Transaction Success User", "transaction-success@example.com");
 
     // When
     UserDto createdUser = userService.createUser(userDto);

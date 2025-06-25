@@ -36,8 +36,8 @@ import org.springframework.test.context.ActiveProfiles;
     partitions = 1,
     topics = {"user-state-test", "user-state-test.DLT"},
     brokerProperties = {
-        "transaction.state.log.replication.factor=1",
-        "transaction.state.log.min.isr=1"
+      "transaction.state.log.replication.factor=1",
+      "transaction.state.log.min.isr=1"
     })
 class KafkaIntegrationTest {
 
