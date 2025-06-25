@@ -33,6 +33,7 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
+@Transactional(readOnly = true)
 public class UserService {
 
   private final UserRepository userRepository;
@@ -44,7 +45,6 @@ public class UserService {
    * @param pageable Pagination information
    * @return Page of UserDto objects
    */
-  @Transactional(readOnly = true)
   public Page<UserDto> getAllUsers(Pageable pageable) {
     log.debug("Retrieving all users with pagination: {}", pageable);
     return userRepository.findAll(pageable).map(this::mapToDto);
@@ -55,7 +55,6 @@ public class UserService {
    *
    * @return List of all UserDto objects
    */
-  @Transactional(readOnly = true)
   public List<UserDto> getAllUsers() {
     log.debug("Retrieving all users");
     return userRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
@@ -68,7 +67,6 @@ public class UserService {
    * @return UserDto for the specified ID
    * @throws UserNotFoundException if user not found
    */
-  @Transactional(readOnly = true)
   public UserDto getUserById(@NotNull UUID id) {
     log.debug("Retrieving user with id: {}", id);
     return userRepository
