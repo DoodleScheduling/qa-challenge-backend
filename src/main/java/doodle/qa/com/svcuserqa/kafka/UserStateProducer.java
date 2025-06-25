@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -35,6 +37,7 @@ public class UserStateProducer extends KafkaProducer<String, Object> {
    * @param user The user entity (must not be null)
    * @param eventType The type of event (CREATED, UPDATED, DELETED, etc.) (must not be null)
    */
+  @Transactional(propagation = Propagation.REQUIRED)
   public void sendUserState(@NotNull User user, @NotNull EventType eventType) {
     UserState userState =
         UserState.newBuilder()

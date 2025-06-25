@@ -33,7 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @EmbeddedKafka(
     partitions = 1,
-    topics = {"user-state-test", "user-state-test.DLT"})
+    topics = {"user-state-test", "user-state-test.DLT"},
+    brokerProperties = {
+        "transaction.state.log.replication.factor=1",
+        "transaction.state.log.min.isr=1"
+    })
 class KafkaErrorHandlingTest {
 
   @Autowired private UserService userService;
