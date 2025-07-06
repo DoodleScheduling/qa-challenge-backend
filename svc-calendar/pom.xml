@@ -11,7 +11,7 @@
 
   <artifactId>svc-calendar</artifactId>
   <name>svc-calendar</name>
-  <description>Calendar service with Kafka integration</description>
+  <description>Calendar service</description>
 
   <dependencies>
     <!-- Spring Boot -->
