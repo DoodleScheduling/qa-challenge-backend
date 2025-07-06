@@ -9,10 +9,17 @@
     <relativePath/>
   </parent>
   <groupId>com.example</groupId>
-  <artifactId>svc-user</artifactId>
+  <artifactId>qa-backend-challenge-services</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>svc-user</name>
-  <description>User service with Kafka integration</description>
+  <packaging>pom</packaging>
+  <name>QA Backend Challenge Services</name>
+  <description>Multi-module project for QA backend services</description>
+
+  <modules>
+    <module>svc-user</module>
+    <module>svc-calendar</module>
+    <module>svc-provider</module>
+  </modules>
 
   <properties>
     <java.version>17</java.version>
@@ -21,126 +28,67 @@
     <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
 
-  <dependencies>
-    <!-- Spring Boot -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.retry</groupId>
-      <artifactId>spring-retry</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aspects</artifactId>
-    </dependency>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Avro and Confluent Schema Registry -->
+      <dependency>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro</artifactId>
+        <version>${avro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.confluent</groupId>
+        <artifactId>kafka-avro-serializer</artifactId>
+        <version>${confluent.version}</version>
+      </dependency>
 
-    <!-- Kafka -->
-    <dependency>
-      <groupId>org.springframework.kafka</groupId>
-      <artifactId>spring-kafka</artifactId>
-    </dependency>
+      <!-- Documentation -->
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>2.3.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-annotations</artifactId>
+        <version>2.2.8</version>
+      </dependency>
 
-    <!-- Avro and Confluent Schema Registry -->
-    <dependency>
-      <groupId>org.apache.avro</groupId>
-      <artifactId>avro</artifactId>
-      <version>${avro.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.confluent</groupId>
-      <artifactId>kafka-avro-serializer</artifactId>
-      <version>${confluent.version}</version>
-    </dependency>
+      <!-- Testing -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>kafka</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>4.2.0</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    <!-- Database -->
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.flywaydb</groupId>
-      <artifactId>flyway-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Documentation -->
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.3.0</version>
-      <!-- This exclusion ensures we don't get conflicts with the annotations -->
-      <exclusions>
-        <exclusion>
-          <groupId>io.swagger.core.v3</groupId>
-          <artifactId>swagger-annotations</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>2.2.8</version>
-    </dependency>
-
-    <!-- Lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <!-- Testing -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.kafka</groupId>
-      <artifactId>spring-kafka-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>kafka</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
-      <version>4.2.0</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <!-- No dependencies at parent level, they are defined in the modules -->
 
   <repositories>
     <repository>
@@ -150,85 +98,60 @@
   </repositories>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <version>2.44.3</version>
-        <configuration>
-          <java>
-            <googleJavaFormat>
-              <version>1.19.2</version>
-              <style>GOOGLE</style>
-            </googleJavaFormat>
-            <removeUnusedImports/>
-          </java>
-          <pom>
-            <sortPom>
-              <indentAttribute>schemaLocation</indentAttribute>
-              <expandEmptyElements>false</expandEmptyElements>
-            </sortPom>
-          </pom>
-        </configuration>
-        <executions>
-          <execution>
-            <id>spotless</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>validate</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.3.0</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-sources/avro</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.avro</groupId>
-        <artifactId>avro-maven-plugin</artifactId>
-        <version>${avro.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>schema</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <sourceDirectory>${project.basedir}/src/main/resources/avro/</sourceDirectory>
-              <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
-              <stringType>String</stringType>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration>
+            <excludes>
+              <exclude>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+              </exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>2.44.3</version>
+          <configuration>
+            <java>
+              <googleJavaFormat>
+                <version>1.19.2</version>
+                <style>GOOGLE</style>
+              </googleJavaFormat>
+              <removeUnusedImports/>
+            </java>
+            <pom>
+              <sortPom>
+                <indentAttribute>schemaLocation</indentAttribute>
+                <expandEmptyElements>false</expandEmptyElements>
+              </sortPom>
+            </pom>
+          </configuration>
+          <executions>
+            <execution>
+              <id>spotless</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>validate</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.avro</groupId>
+          <artifactId>avro-maven-plugin</artifactId>
+          <version>${avro.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

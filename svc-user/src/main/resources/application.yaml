@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: svc-user-qa
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/svc_user_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  # Flyway Configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9093
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 1
+        retry.backoff.ms: 1000
+        schema.registry.url: ${schema-registry.url}
+    consumer:
+      group-id: user-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      enable-auto-commit: false
+      properties:
+        schema.registry.url: ${schema-registry.url}
+        specific.avro.reader: true
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+
+  # Retry Configuration
+  retry:
+    kafka:
+      max-attempts: 3
+      initial-interval: 1000
+      multiplier: 2.0
+      max-interval: 10000
+
+# Schema Registry Configuration
+schema-registry:
+  url: http://localhost:8081
+
+# Kafka Topics
+kafka:
+  topics:
+    user-state: user-state
+    user-state-dlt: user-state.DLT
+
+# Server Configuration
+server:
+  port: 8080
+
+# Logging Configuration
+logging:
+  level:
+    com.example.svcuser: INFO
+    org.springframework.kafka: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true

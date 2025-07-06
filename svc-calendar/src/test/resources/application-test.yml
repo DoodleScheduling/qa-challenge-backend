@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: svc-calendar-qa-test

@@ -1,10 +1,10 @@
 spring:
   application:
-    name: svc-user-qa
+    name: svc-calendar-qa
 
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/userdb
+    url: jdbc:postgresql://localhost:5432/svc_calendar_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -26,18 +26,8 @@ spring:
   # Kafka Configuration
   kafka:
     bootstrap-servers: localhost:9093
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-      acks: all
-      retries: 3
-      properties:
-        enable.idempotence: true
-        max.in.flight.requests.per.connection: 1
-        retry.backoff.ms: 1000
-        schema.registry.url: ${schema-registry.url}
     consumer:
-      group-id: user-service-group
+      group-id: calendar-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
@@ -68,12 +58,12 @@ kafka:
 
 # Server Configuration
 server:
-  port: 8080
+  port: 8082
 
 # Logging Configuration
 logging:
   level:
-    com.example.svcuser: INFO
+    doodle.qa.com.svccalendarqa: INFO
     org.springframework.kafka: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
