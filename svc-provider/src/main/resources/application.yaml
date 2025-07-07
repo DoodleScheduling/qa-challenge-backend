@@ -2,7 +2,7 @@ spring:
   application:
     name: svc-provider
 server:
-  port: 8082
+  port: 8083
 
 springdoc:
   api-docs:
