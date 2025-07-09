@@ -7,7 +7,6 @@ import doodle.qa.com.svcproviderqa.entity.Event;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
-import doodle.qa.com.svcproviderqa.repository.EventRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -94,6 +94,12 @@ public class CalendarService {
     log.debug("Creating calendar with name: {}", calendarDto.getName());
 
     try {
+      // Check if a calendar with the same name already exists
+      if (calendarRepository.findAll().stream()
+          .anyMatch(c -> c.getName().equals(calendarDto.getName()))) {
+        throw new DataIntegrityViolationException("Calendar with name '" + calendarDto.getName() + "' already exists");
+      }
+
       Calendar calendar =
           Calendar.builder()
               .name(calendarDto.getName())
@@ -103,17 +109,26 @@ public class CalendarService {
       Calendar savedCalendar = calendarRepository.save(calendar);
 
       // Process events if any
+      List<EventDto> createdEvents = new ArrayList<>();
       if (calendarDto.getEvents() != null && !calendarDto.getEvents().isEmpty()) {
         for (EventDto eventDto : calendarDto.getEvents()) {
           eventDto.setCalendarId(savedCalendar.getId());
-          eventService.createEvent(eventDto);
+          EventDto createdEvent = eventService.createEvent(eventDto);
+          createdEvents.add(createdEvent);
         }
         // Refresh the calendar to get the events
         savedCalendar = calendarRepository.findById(savedCalendar.getId()).orElse(savedCalendar);
       }
 
       log.info("Calendar created: {}", savedCalendar.getId());
-      return mapToDto(savedCalendar);
+      CalendarDto result = mapToDto(savedCalendar);
+
+      // If we created events, use them in the result
+      if (!createdEvents.isEmpty()) {
+        result.setEvents(createdEvents);
+      }
+
+      return result;
     } catch (OptimisticLockingFailureException e) {
       log.warn(
           "Concurrent modification detected while creating calendar with name: {}",

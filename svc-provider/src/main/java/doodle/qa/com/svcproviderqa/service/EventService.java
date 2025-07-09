@@ -158,6 +158,9 @@ public class EventService {
               .calendar(calendar)
               .build();
 
+      // Add the event to the calendar's events list
+      calendar.addEvent(event);
+
       Event savedEvent = eventRepository.save(event);
 
       log.info("Event created: {}", savedEvent.getId());

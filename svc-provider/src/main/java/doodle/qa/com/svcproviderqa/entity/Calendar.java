@@ -15,7 +15,9 @@ import lombok.NoArgsConstructor;
  * handle concurrent modifications.
  */
 @Entity
-@Table(name = "calendars")
+@Table(name = "calendars", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "name", name = "uk_calendar_name")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,7 +29,7 @@ public class Calendar {
   private UUID id;
 
   @NotBlank(message = "Name is required")
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String name;
 
   @Column(length = 1000)
