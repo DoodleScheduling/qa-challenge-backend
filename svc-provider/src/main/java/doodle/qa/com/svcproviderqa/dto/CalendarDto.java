@@ -1,5 +1,6 @@
 package doodle.qa.com.svcproviderqa.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -22,6 +23,11 @@ public class CalendarDto {
 
   private String description;
 
+  /**
+   * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
+   * conflicts.
+   */
+  @JsonIgnore
   private Long version;
 
   @Valid

@@ -1,5 +1,6 @@
 package doodle.qa.com.svcproviderqa.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -29,6 +30,11 @@ public class EventDto {
 
   private String location;
 
+  /**
+   * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
+   * conflicts.
+   */
+  @JsonIgnore
   private Long version;
 
   private UUID calendarId;
