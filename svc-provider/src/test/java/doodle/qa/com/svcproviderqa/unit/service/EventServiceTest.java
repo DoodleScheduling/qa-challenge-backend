@@ -15,9 +15,14 @@ import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
 import doodle.qa.com.svcproviderqa.repository.EventRepository;
 import doodle.qa.com.svcproviderqa.service.EventService;
 import doodle.qa.com.svcproviderqa.util.TestDataFactory;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,10 +44,13 @@ class EventServiceTest {
   @Mock private CalendarRepository calendarRepository;
 
   private EventService eventService;
+  private Validator validator;
 
   @BeforeEach
   void setUp() {
     eventService = new EventService(eventRepository, calendarRepository);
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    validator = factory.getValidator();
   }
 
   @Test
@@ -539,5 +547,60 @@ class EventServiceTest {
     assertThrows(ConcurrentModificationException.class, () -> eventService.deleteEvent(eventId));
     verify(eventRepository).findById(eventId);
     verify(eventRepository).delete(any(Event.class));
+  }
+
+  @Test
+  @DisplayName("Should detect validation error when creating event with end time before start time")
+  void createEvent_WhenEndTimeBeforeStartTime_ShouldDetectValidationError() {
+    // Given
+    UUID calendarId = UUID.randomUUID();
+    LocalDateTime now = LocalDateTime.now();
+    // Create an event with end time before start time
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Invalid Event",
+            "Invalid Time Range",
+            now,
+            now.minusHours(1), // End time is before start time
+            "Test Location",
+            calendarId);
+
+    // When
+    Set<ConstraintViolation<EventDto>> violations = validator.validate(eventDto);
+
+    // Then
+    assertThat(violations).isNotEmpty();
+    assertThat(violations.size()).isEqualTo(1);
+    ConstraintViolation<EventDto> violation = violations.iterator().next();
+    assertThat(violation.getMessage()).isEqualTo("End time must be after start time");
+  }
+
+  @Test
+  @DisplayName("Should detect validation error when updating event with end time before start time")
+  void updateEvent_WhenEndTimeBeforeStartTime_ShouldDetectValidationError() {
+    // Given
+    UUID eventId = UUID.randomUUID();
+    UUID calendarId = UUID.randomUUID();
+    LocalDateTime now = LocalDateTime.now();
+
+    // Create an event with end time before start time
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Invalid Event",
+            "Invalid Time Range",
+            now,
+            now.minusHours(1), // End time is before start time
+            "Test Location",
+            calendarId);
+
+    // When
+    Set<ConstraintViolation<EventDto>> violations = validator.validate(eventDto);
+
+    // Then
+    assertThat(violations).isNotEmpty();
+    assertThat(violations.size()).isEqualTo(1);
+    ConstraintViolation<EventDto> violation = violations.iterator().next();
+    assertThat(violation.getMessage()).isEqualTo("End time must be after start time");
   }
 }

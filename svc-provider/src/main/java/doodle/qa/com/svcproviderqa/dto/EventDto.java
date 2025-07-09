@@ -1,6 +1,7 @@
 package doodle.qa.com.svcproviderqa.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import doodle.qa.com.svcproviderqa.validation.ValidEventTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ValidEventTime(message = "End time must be after start time")
 public class EventDto {
   private UUID id;
 

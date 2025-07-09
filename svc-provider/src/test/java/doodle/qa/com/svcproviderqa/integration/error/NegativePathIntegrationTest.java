@@ -231,6 +231,72 @@ class NegativePathIntegrationTest {
     assertThat(events).hasSize(0);
   }
 
+  @Test
+  @DisplayName(
+      "Should throw ConstraintViolationException when creating event with end time before start time")
+  void testCreateEventWithEndTimeBeforeStartTime() {
+    // Given
+    CalendarDto calendarDto = createTestCalendar();
+    UUID calendarId = calendarDto.getId();
+    LocalDateTime now = LocalDateTime.now();
+
+    // Create an event with end time before start time
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Invalid Event",
+            "Invalid Time Range",
+            now,
+            now.minusHours(1), // End time is before start time
+            "Test Location",
+            calendarId);
+
+    // When/Then
+    assertThatThrownBy(() -> eventService.createEvent(eventDto))
+        .isInstanceOf(jakarta.validation.ConstraintViolationException.class)
+        .hasMessageContaining("End time must be after start time");
+  }
+
+  @Test
+  @DisplayName(
+      "Should throw ConstraintViolationException when updating event with end time before start time")
+  void testUpdateEventWithEndTimeBeforeStartTime() {
+    // Given
+    // Create a calendar and a valid event
+    CalendarDto calendarDto = createTestCalendar();
+    UUID calendarId = calendarDto.getId();
+    LocalDateTime now = LocalDateTime.now();
+
+    EventDto validEventDto =
+        TestDataFactory.createEventDto(
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendarId);
+
+    EventDto createdEvent = eventService.createEvent(validEventDto);
+    UUID eventId = createdEvent.getId();
+
+    // Try to update with invalid time range
+    EventDto invalidUpdateDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now,
+            now.minusHours(1), // End time is before start time
+            "Updated Location",
+            calendarId);
+    invalidUpdateDto.setVersion(
+        createdEvent.getVersion()); // Set the version for optimistic locking
+
+    // When/Then
+    assertThatThrownBy(() -> eventService.updateEvent(eventId, invalidUpdateDto))
+        .isInstanceOf(jakarta.validation.ConstraintViolationException.class)
+        .hasMessageContaining("End time must be after start time");
+  }
+
   // Helper method to create a test calendar
   private CalendarDto createTestCalendar() {
     CalendarDto calendarDto =
