@@ -48,7 +48,8 @@ class CalendarServiceIntegrationTest {
   void testCreateCalendar() {
     // Given
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto("Integration Test Calendar", "Integration Test Description");
+        TestDataFactory.createCalendarDto(
+            "Integration Test Calendar", "Integration Test Description");
 
     // When
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
@@ -67,12 +68,14 @@ class CalendarServiceIntegrationTest {
   @DisplayName("Should successfully update a calendar's information")
   void testUpdateCalendar() {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Original Calendar", "Original Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Original Calendar", "Original Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     UUID calendarId = createdCalendar.getId();
 
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     updateDto.setVersion(createdCalendar.getVersion()); // Set the version for optimistic locking
 
     // When
@@ -91,7 +94,8 @@ class CalendarServiceIntegrationTest {
   @DisplayName("Should successfully delete a calendar from the database")
   void testDeleteCalendar() {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Calendar To Delete", "Delete Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Calendar To Delete", "Delete Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     UUID calendarId = createdCalendar.getId();
 
@@ -127,7 +131,8 @@ class CalendarServiceIntegrationTest {
   @DisplayName("Should successfully retrieve a calendar by ID")
   void testGetCalendarById() {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     UUID calendarId = createdCalendar.getId();
 
@@ -147,12 +152,15 @@ class CalendarServiceIntegrationTest {
     List<doodle.qa.com.svcproviderqa.dto.EventDto> events = new ArrayList<>();
     LocalDateTime now = java.time.LocalDateTime.now();
 
-    events.add(TestDataFactory.createEventDto(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", null));
-    events.add(TestDataFactory.createEventDto(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", null));
+    events.add(
+        TestDataFactory.createEventDto(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", null));
+    events.add(
+        TestDataFactory.createEventDto(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", null));
 
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Calendar With Events", "Events Description", events);
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Calendar With Events", "Events Description", events);
 
     // When
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);

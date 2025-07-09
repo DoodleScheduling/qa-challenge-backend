@@ -45,11 +45,13 @@ class EventRepositoryTest {
   @DisplayName("Should find events by calendar when events exist")
   void findByCalendar_WhenEventsExist_ShouldReturnEvents() {
     // Given
-    Event event1 = TestDataFactory.createEvent(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
-    Event event2 = TestDataFactory.createEvent(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
-    
+    Event event1 =
+        TestDataFactory.createEvent(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
+    Event event2 =
+        TestDataFactory.createEvent(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
+
     eventRepository.save(event1);
     eventRepository.save(event2);
 
@@ -66,11 +68,13 @@ class EventRepositoryTest {
   @DisplayName("Should find events by calendar ID when events exist")
   void findByCalendarId_WhenEventsExist_ShouldReturnEvents() {
     // Given
-    Event event1 = TestDataFactory.createEvent(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
-    Event event2 = TestDataFactory.createEvent(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
-    
+    Event event1 =
+        TestDataFactory.createEvent(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
+    Event event2 =
+        TestDataFactory.createEvent(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
+
     eventRepository.save(event1);
     eventRepository.save(event2);
 
@@ -87,20 +91,23 @@ class EventRepositoryTest {
   @DisplayName("Should find events by start time between when events exist")
   void findByStartTimeBetween_WhenEventsExist_ShouldReturnEvents() {
     // Given
-    Event event1 = TestDataFactory.createEvent(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
-    Event event2 = TestDataFactory.createEvent(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
-    Event event3 = TestDataFactory.createEvent(
-        "Event 3", "Description 3", now.plusHours(4), now.plusHours(5), "Location 3", calendar);
-    
+    Event event1 =
+        TestDataFactory.createEvent(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
+    Event event2 =
+        TestDataFactory.createEvent(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
+    Event event3 =
+        TestDataFactory.createEvent(
+            "Event 3", "Description 3", now.plusHours(4), now.plusHours(5), "Location 3", calendar);
+
     eventRepository.save(event1);
     eventRepository.save(event2);
     eventRepository.save(event3);
 
     // When
-    List<Event> events = eventRepository.findByStartTimeBetween(
-        now.minusHours(1), now.plusHours(3));
+    List<Event> events =
+        eventRepository.findByStartTimeBetween(now.minusHours(1), now.plusHours(3));
 
     // Then
     assertThat(events).hasSize(2);
@@ -112,23 +119,33 @@ class EventRepositoryTest {
   @DisplayName("Should find events by calendar ID and start time between when events exist")
   void findByCalendarIdAndStartTimeBetween_WhenEventsExist_ShouldReturnEvents() {
     // Given
-    Calendar anotherCalendar = TestDataFactory.createCalendar("Another Calendar", "Another Description");
+    Calendar anotherCalendar =
+        TestDataFactory.createCalendar("Another Calendar", "Another Description");
     anotherCalendar = calendarRepository.save(anotherCalendar);
-    
-    Event event1 = TestDataFactory.createEvent(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
-    Event event2 = TestDataFactory.createEvent(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
-    Event event3 = TestDataFactory.createEvent(
-        "Event 3", "Description 3", now.plusHours(1), now.plusHours(2), "Location 3", anotherCalendar);
-    
+
+    Event event1 =
+        TestDataFactory.createEvent(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
+    Event event2 =
+        TestDataFactory.createEvent(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
+    Event event3 =
+        TestDataFactory.createEvent(
+            "Event 3",
+            "Description 3",
+            now.plusHours(1),
+            now.plusHours(2),
+            "Location 3",
+            anotherCalendar);
+
     eventRepository.save(event1);
     eventRepository.save(event2);
     eventRepository.save(event3);
 
     // When
-    List<Event> events = eventRepository.findByCalendarIdAndStartTimeBetween(
-        calendarId, now.minusHours(1), now.plusHours(3));
+    List<Event> events =
+        eventRepository.findByCalendarIdAndStartTimeBetween(
+            calendarId, now.minusHours(1), now.plusHours(3));
 
     // Then
     assertThat(events).hasSize(2);
@@ -140,8 +157,9 @@ class EventRepositoryTest {
   @DisplayName("Should save event with calendar reference")
   void save_WithCalendar_ShouldPersistCalendarReference() {
     // Given
-    Event event = TestDataFactory.createEvent(
-        "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendar);
+    Event event =
+        TestDataFactory.createEvent(
+            "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendar);
 
     // When
     Event savedEvent = eventRepository.save(event);
@@ -156,8 +174,14 @@ class EventRepositoryTest {
   @DisplayName("Should update event when saving with existing ID")
   void save_WithExistingId_ShouldUpdateEvent() {
     // Given
-    Event event = TestDataFactory.createEvent(
-        "Original Title", "Original Description", now, now.plusHours(1), "Original Location", calendar);
+    Event event =
+        TestDataFactory.createEvent(
+            "Original Title",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendar);
     Event savedEvent = eventRepository.save(event);
     UUID eventId = savedEvent.getId();
 
@@ -178,8 +202,14 @@ class EventRepositoryTest {
   @DisplayName("Should delete event when event exists")
   void delete_WhenEventExists_ShouldRemoveEvent() {
     // Given
-    Event event = TestDataFactory.createEvent(
-        "Event To Delete", "Delete Description", now, now.plusHours(1), "Delete Location", calendar);
+    Event event =
+        TestDataFactory.createEvent(
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendar);
     Event savedEvent = eventRepository.save(event);
     UUID eventId = savedEvent.getId();
 
@@ -195,8 +225,14 @@ class EventRepositoryTest {
   @DisplayName("Should not delete calendar when event is deleted")
   void delete_WhenEventExists_ShouldNotRemoveCalendar() {
     // Given
-    Event event = TestDataFactory.createEvent(
-        "Event To Delete", "Delete Description", now, now.plusHours(1), "Delete Location", calendar);
+    Event event =
+        TestDataFactory.createEvent(
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendar);
     Event savedEvent = eventRepository.save(event);
 
     // When

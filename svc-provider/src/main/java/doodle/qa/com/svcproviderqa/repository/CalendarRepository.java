@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   Optional<Calendar> findByName(String name);
-  
+
   boolean existsByName(String name);
 }

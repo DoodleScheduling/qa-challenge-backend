@@ -9,15 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class EventController {
 
   private final EventService eventService;
-
 
   /**
    * Retrieves an event by ID.
@@ -69,7 +63,6 @@ public class EventController {
     log.info("Retrieved {} events for calendar id: {}", events.size(), calendarId);
     return ResponseEntity.ok(events);
   }
-
 
   /**
    * Retrieves events for a calendar within a time range.
@@ -116,17 +109,15 @@ public class EventController {
   @Operation(summary = "Create event", description = "Creates a new event")
   @ApiResponse(responseCode = "201", description = "Event created successfully")
   @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
-  @ApiResponse(
-      responseCode = "404",
-      description = "Calendar not found",
-      content = @Content)
+  @ApiResponse(responseCode = "404", description = "Calendar not found", content = @Content)
   @ApiResponse(
       responseCode = "409",
       description = "Conflict - concurrent modification",
       content = @Content)
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<EventDto> createEvent(
-      @Parameter(description = "Event data", required = true) @Valid @RequestBody EventDto eventDto) {
+      @Parameter(description = "Event data", required = true) @Valid @RequestBody
+          EventDto eventDto) {
     log.debug("POST request to create event with title: {}", eventDto.getTitle());
     EventDto createdEvent = eventService.createEvent(eventDto);
     log.info("Created event with id: {}", createdEvent.getId());
@@ -152,7 +143,8 @@ public class EventController {
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<EventDto> updateEvent(
       @Parameter(description = "Event ID", required = true) @PathVariable UUID id,
-      @Parameter(description = "Event data", required = true) @Valid @RequestBody EventDto eventDto) {
+      @Parameter(description = "Event data", required = true) @Valid @RequestBody
+          EventDto eventDto) {
     log.debug("PUT request to update event with id: {}", id);
     EventDto updatedEvent = eventService.updateEvent(id, eventDto);
     log.info("Updated event with id: {}", id);

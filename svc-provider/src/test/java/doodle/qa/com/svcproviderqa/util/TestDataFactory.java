@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Factory class for creating test data objects. This class provides methods to create test calendars
- * and events with predefined or random data.
+ * Factory class for creating test data objects. This class provides methods to create test
+ * calendars and events with predefined or random data.
  */
 public class TestDataFactory {
 
@@ -27,17 +27,13 @@ public class TestDataFactory {
    */
   public static Calendar createCalendar(
       UUID id, String name, String description, List<Event> events, Long version) {
-    Calendar calendar = Calendar.builder()
-        .id(id)
-        .name(name)
-        .description(description)
-        .version(version)
-        .build();
-    
+    Calendar calendar =
+        Calendar.builder().id(id).name(name).description(description).version(version).build();
+
     if (events != null) {
       events.forEach(calendar::addEvent);
     }
-    
+
     return calendar;
   }
 
@@ -51,13 +47,14 @@ public class TestDataFactory {
    * @param events The list of events
    * @return A Calendar entity
    */
-  public static Calendar createCalendar(UUID id, String name, String description, List<Event> events) {
+  public static Calendar createCalendar(
+      UUID id, String name, String description, List<Event> events) {
     return createCalendar(id, name, description, events, null);
   }
 
   /**
-   * Creates a Calendar entity with the given name, description, and events. The ID will be null, which
-   * is appropriate for new calendars that haven't been persisted yet.
+   * Creates a Calendar entity with the given name, description, and events. The ID will be null,
+   * which is appropriate for new calendars that haven't been persisted yet.
    *
    * @param name The calendar name
    * @param description The calendar description
@@ -69,8 +66,8 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates a Calendar entity with the given name and description. The ID will be null and the events
-   * list will be empty.
+   * Creates a Calendar entity with the given name and description. The ID will be null and the
+   * events list will be empty.
    *
    * @param name The calendar name
    * @param description The calendar description
@@ -102,8 +99,8 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates a CalendarDto with the given ID, name, description, and events. The version will be null,
-   * which is appropriate for new calendars that haven't been persisted yet.
+   * Creates a CalendarDto with the given ID, name, description, and events. The version will be
+   * null, which is appropriate for new calendars that haven't been persisted yet.
    *
    * @param id The calendar ID
    * @param name The calendar name
@@ -111,13 +108,14 @@ public class TestDataFactory {
    * @param events The list of event DTOs
    * @return A CalendarDto
    */
-  public static CalendarDto createCalendarDto(UUID id, String name, String description, List<EventDto> events) {
+  public static CalendarDto createCalendarDto(
+      UUID id, String name, String description, List<EventDto> events) {
     return createCalendarDto(id, name, description, events, null);
   }
 
   /**
-   * Creates a CalendarDto with the given name, description, events, and version. The ID will be null,
-   * which is appropriate for new calendars that haven't been persisted yet.
+   * Creates a CalendarDto with the given name, description, events, and version. The ID will be
+   * null, which is appropriate for new calendars that haven't been persisted yet.
    *
    * @param name The calendar name
    * @param description The calendar description
@@ -139,13 +137,14 @@ public class TestDataFactory {
    * @param events The list of event DTOs
    * @return A CalendarDto
    */
-  public static CalendarDto createCalendarDto(String name, String description, List<EventDto> events) {
+  public static CalendarDto createCalendarDto(
+      String name, String description, List<EventDto> events) {
     return createCalendarDto(null, name, description, events, null);
   }
 
   /**
-   * Creates a CalendarDto with the given name and description. The ID and version will be null, and the
-   * events list will be empty.
+   * Creates a CalendarDto with the given name and description. The ID and version will be null, and
+   * the events list will be empty.
    *
    * @param name The calendar name
    * @param description The calendar description
@@ -156,7 +155,8 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates an Event entity with the given ID, title, description, start time, end time, location, calendar, and version.
+   * Creates an Event entity with the given ID, title, description, start time, end time, location,
+   * calendar, and version.
    *
    * @param id The event ID
    * @param title The event title
@@ -169,8 +169,14 @@ public class TestDataFactory {
    * @return An Event entity
    */
   public static Event createEvent(
-      UUID id, String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, Calendar calendar, Long version) {
+      UUID id,
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      Calendar calendar,
+      Long version) {
     return Event.builder()
         .id(id)
         .title(title)
@@ -184,8 +190,9 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates an Event entity with the given ID, title, description, start time, end time, location, and calendar.
-   * The version will be null, which is appropriate for new events that haven't been persisted yet.
+   * Creates an Event entity with the given ID, title, description, start time, end time, location,
+   * and calendar. The version will be null, which is appropriate for new events that haven't been
+   * persisted yet.
    *
    * @param id The event ID
    * @param title The event title
@@ -197,14 +204,20 @@ public class TestDataFactory {
    * @return An Event entity
    */
   public static Event createEvent(
-      UUID id, String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, Calendar calendar) {
+      UUID id,
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      Calendar calendar) {
     return createEvent(id, title, description, startTime, endTime, location, calendar, null);
   }
 
   /**
-   * Creates an Event entity with the given title, description, start time, end time, location, and calendar.
-   * The ID will be null, which is appropriate for new events that haven't been persisted yet.
+   * Creates an Event entity with the given title, description, start time, end time, location, and
+   * calendar. The ID will be null, which is appropriate for new events that haven't been persisted
+   * yet.
    *
    * @param title The event title
    * @param description The event description
@@ -215,13 +228,18 @@ public class TestDataFactory {
    * @return An Event entity
    */
   public static Event createEvent(
-      String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, Calendar calendar) {
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      Calendar calendar) {
     return createEvent(null, title, description, startTime, endTime, location, calendar);
   }
 
   /**
-   * Creates an EventDto with the given ID, title, description, start time, end time, location, calendar ID, and version.
+   * Creates an EventDto with the given ID, title, description, start time, end time, location,
+   * calendar ID, and version.
    *
    * @param id The event ID
    * @param title The event title
@@ -234,8 +252,14 @@ public class TestDataFactory {
    * @return An EventDto
    */
   public static EventDto createEventDto(
-      UUID id, String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, UUID calendarId, Long version) {
+      UUID id,
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      UUID calendarId,
+      Long version) {
     return EventDto.builder()
         .id(id)
         .title(title)
@@ -249,8 +273,9 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates an EventDto with the given ID, title, description, start time, end time, location, and calendar ID.
-   * The version will be null, which is appropriate for new events that haven't been persisted yet.
+   * Creates an EventDto with the given ID, title, description, start time, end time, location, and
+   * calendar ID. The version will be null, which is appropriate for new events that haven't been
+   * persisted yet.
    *
    * @param id The event ID
    * @param title The event title
@@ -262,14 +287,20 @@ public class TestDataFactory {
    * @return An EventDto
    */
   public static EventDto createEventDto(
-      UUID id, String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, UUID calendarId) {
+      UUID id,
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      UUID calendarId) {
     return createEventDto(id, title, description, startTime, endTime, location, calendarId, null);
   }
 
   /**
-   * Creates an EventDto with the given title, description, start time, end time, location, and calendar ID.
-   * The ID will be null, which is appropriate for new events that haven't been persisted yet.
+   * Creates an EventDto with the given title, description, start time, end time, location, and
+   * calendar ID. The ID will be null, which is appropriate for new events that haven't been
+   * persisted yet.
    *
    * @param title The event title
    * @param description The event description
@@ -280,8 +311,12 @@ public class TestDataFactory {
    * @return An EventDto
    */
   public static EventDto createEventDto(
-      String title, String description, LocalDateTime startTime, LocalDateTime endTime,
-      String location, UUID calendarId) {
+      String title,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime,
+      String location,
+      UUID calendarId) {
     return createEventDto(null, title, description, startTime, endTime, location, calendarId);
   }
 

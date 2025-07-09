@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 
-/**
- * Tests for DTO serialization to ensure that certain fields are excluded from JSON responses.
- */
+/** Tests for DTO serialization to ensure that certain fields are excluded from JSON responses. */
 @JsonTest
 class DtoSerializationTest {
 
@@ -26,8 +24,8 @@ class DtoSerializationTest {
   void testCalendarDtoVersionFieldExclusion() throws Exception {
     // Given
     UUID id = UUID.randomUUID();
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto(
-        id, "Test Calendar", "Test Description", null, 123L);
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto(id, "Test Calendar", "Test Description", null, 123L);
 
     // When
     String json = objectMapper.writeValueAsString(calendarDto);
@@ -46,9 +44,16 @@ class DtoSerializationTest {
     UUID id = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventDto = TestDataFactory.createEventDto(
-        id, "Test Event", "Test Description", now, now.plusHours(1), 
-        "Test Location", calendarId, 456L);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            id,
+            "Test Event",
+            "Test Description",
+            now,
+            now.plusHours(1),
+            "Test Location",
+            calendarId,
+            456L);
 
     // When
     String json = objectMapper.writeValueAsString(eventDto);

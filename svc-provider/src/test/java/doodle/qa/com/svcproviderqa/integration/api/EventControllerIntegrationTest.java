@@ -50,7 +50,8 @@ class EventControllerIntegrationTest {
   @BeforeEach
   void setUp() {
     // Create a calendar for testing
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     calendarId = createdCalendar.getId();
     now = LocalDateTime.now();
@@ -60,8 +61,9 @@ class EventControllerIntegrationTest {
   @DisplayName("Should create an event and then retrieve it by ID")
   void testCreateAndRetrieveEvent() throws Exception {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendarId);
     String eventJson = objectMapper.writeValueAsString(eventDto);
 
     // When/Then - Create event
@@ -96,14 +98,26 @@ class EventControllerIntegrationTest {
   @DisplayName("Should update an event's information")
   void testUpdateEvent() throws Exception {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Original Event", "Original Description", now, now.plusHours(1), "Original Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendarId);
     EventDto createdEvent = eventService.createEvent(eventDto);
     UUID eventId = createdEvent.getId();
 
-    EventDto updateDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto updateDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     // When/Then
@@ -124,8 +138,14 @@ class EventControllerIntegrationTest {
   @DisplayName("Should delete an event")
   void testDeleteEvent() throws Exception {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Event To Delete", "Delete Description", now, now.plusHours(1), "Delete Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendarId);
     EventDto createdEvent = eventService.createEvent(eventDto);
     UUID eventId = createdEvent.getId();
 
@@ -140,10 +160,17 @@ class EventControllerIntegrationTest {
   @DisplayName("Should retrieve events by calendar ID")
   void testGetEventsByCalendarId() throws Exception {
     // Given
-    EventDto event1 = TestDataFactory.createEventDto(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
-    EventDto event2 = TestDataFactory.createEventDto(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendarId);
+    EventDto event1 =
+        TestDataFactory.createEventDto(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
+    EventDto event2 =
+        TestDataFactory.createEventDto(
+            "Event 2",
+            "Description 2",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Location 2",
+            calendarId);
 
     eventService.createEvent(event1);
     eventService.createEvent(event2);
@@ -158,22 +185,35 @@ class EventControllerIntegrationTest {
         .andExpect(jsonPath("$[1].title", is("Event 2")));
   }
 
-
   @Test
   @DisplayName("Should retrieve events by calendar ID and time range")
   void testGetEventsByCalendarIdAndTimeRange() throws Exception {
     // Given
     // Create another calendar
-    CalendarDto anotherCalendarDto = TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
+    CalendarDto anotherCalendarDto =
+        TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
     CalendarDto anotherCalendar = calendarService.createCalendar(anotherCalendarDto);
     UUID anotherCalendarId = anotherCalendar.getId();
 
-    EventDto event1 = TestDataFactory.createEventDto(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
-    EventDto event2 = TestDataFactory.createEventDto(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendarId);
-    EventDto event3 = TestDataFactory.createEventDto(
-        "Event 3", "Description 3", now.plusHours(1), now.plusHours(2), "Location 3", anotherCalendarId);
+    EventDto event1 =
+        TestDataFactory.createEventDto(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
+    EventDto event2 =
+        TestDataFactory.createEventDto(
+            "Event 2",
+            "Description 2",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Location 2",
+            calendarId);
+    EventDto event3 =
+        TestDataFactory.createEventDto(
+            "Event 3",
+            "Description 3",
+            now.plusHours(1),
+            now.plusHours(2),
+            "Location 3",
+            anotherCalendarId);
 
     eventService.createEvent(event1);
     eventService.createEvent(event2);
@@ -185,9 +225,10 @@ class EventControllerIntegrationTest {
 
     // When/Then
     mockMvc
-        .perform(get("/api/events/calendar/{calendarId}/timerange", calendarId)
-            .param("start", startTime)
-            .param("end", endTime))
+        .perform(
+            get("/api/events/calendar/{calendarId}/timerange", calendarId)
+                .param("start", startTime)
+                .param("end", endTime))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(2)))
@@ -204,9 +245,15 @@ class EventControllerIntegrationTest {
     mockMvc.perform(get("/api/events/{id}", nonExistentId)).andExpect(status().isNotFound());
 
     // When/Then - Update non-existent event
-    EventDto updateDto = TestDataFactory.createEventDto(
-        nonExistentId, "Updated Event", "Updated Description", now, now.plusHours(1),
-        "Updated Location", calendarId);
+    EventDto updateDto =
+        TestDataFactory.createEventDto(
+            nonExistentId,
+            "Updated Event",
+            "Updated Description",
+            now,
+            now.plusHours(1),
+            "Updated Location",
+            calendarId);
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     mockMvc
@@ -225,8 +272,14 @@ class EventControllerIntegrationTest {
   void testCalendarNotFound() throws Exception {
     // Given
     UUID nonExistentCalendarId = UUID.randomUUID();
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Test Event", "Test Description", now, now.plusHours(1), "Test Location", nonExistentCalendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Test Event",
+            "Test Description",
+            now,
+            now.plusHours(1),
+            "Test Location",
+            nonExistentCalendarId);
     String eventJson = objectMapper.writeValueAsString(eventDto);
 
     // When/Then - Create event with non-existent calendar
@@ -239,10 +292,11 @@ class EventControllerIntegrationTest {
   @DisplayName("Should return 400 when creating an event with invalid data")
   void testCreateEventWithInvalidData() throws Exception {
     // Given
-    EventDto invalidEvent = EventDto.builder()
-        .description("Invalid Event")
-        .calendarId(calendarId)
-        .build(); // Missing title, start time, and end time
+    EventDto invalidEvent =
+        EventDto.builder()
+            .description("Invalid Event")
+            .calendarId(calendarId)
+            .build(); // Missing title, start time, and end time
     String invalidJson = objectMapper.writeValueAsString(invalidEvent);
 
     // When/Then
@@ -250,5 +304,4 @@ class EventControllerIntegrationTest {
         .perform(post("/api/events").contentType(MediaType.APPLICATION_JSON).content(invalidJson))
         .andExpect(status().isBadRequest());
   }
-
 }

@@ -23,10 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,7 +36,6 @@ class EventControllerTest {
 
   @MockBean private EventService eventService;
 
-
   @Test
   @DisplayName("Should return event when getting event by ID that exists")
   void getEventById_WhenEventExists_ShouldReturnEvent() throws Exception {
@@ -48,8 +43,15 @@ class EventControllerTest {
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto event = TestDataFactory.createEventDto(
-        eventId, "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendarId);
+    EventDto event =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Test Event",
+            "Test Description",
+            now,
+            now.plusHours(1),
+            "Test Location",
+            calendarId);
     when(eventService.getEventById(eventId)).thenReturn(event);
 
     // When/Then
@@ -99,7 +101,6 @@ class EventControllerTest {
     verify(eventService).getEventsByCalendarId(calendarId);
   }
 
-
   @Test
   @DisplayName("Should return events when getting events by calendar ID and time range")
   void getEventsByCalendarIdAndTimeRange_ShouldReturnEvents() throws Exception {
@@ -109,7 +110,8 @@ class EventControllerTest {
     LocalDateTime end = start.plusDays(7);
     List<EventDto> events = TestDataFactory.createEventDtoList(3, calendarId);
     when(eventService.getEventsByCalendarIdAndTimeRange(
-        eq(calendarId), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(events);
+            eq(calendarId), any(LocalDateTime.class), any(LocalDateTime.class)))
+        .thenReturn(events);
 
     // Format dates for URL
     String startParam = start.format(DateTimeFormatter.ISO_DATE_TIME);
@@ -117,9 +119,10 @@ class EventControllerTest {
 
     // When/Then
     mockMvc
-        .perform(get("/api/events/calendar/{calendarId}/timerange", calendarId)
-            .param("start", startParam)
-            .param("end", endParam))
+        .perform(
+            get("/api/events/calendar/{calendarId}/timerange", calendarId)
+                .param("start", startParam)
+                .param("end", endParam))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(3)))
@@ -127,8 +130,9 @@ class EventControllerTest {
         .andExpect(jsonPath("$[1].title", is(events.get(1).getTitle())))
         .andExpect(jsonPath("$[2].title", is(events.get(2).getTitle())));
 
-    verify(eventService).getEventsByCalendarIdAndTimeRange(
-        eq(calendarId), any(LocalDateTime.class), any(LocalDateTime.class));
+    verify(eventService)
+        .getEventsByCalendarIdAndTimeRange(
+            eq(calendarId), any(LocalDateTime.class), any(LocalDateTime.class));
   }
 
   @Test
@@ -137,10 +141,18 @@ class EventControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventToCreate = TestDataFactory.createEventDto(
-        "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
-    EventDto createdEvent = TestDataFactory.createEventDto(
-        UUID.randomUUID(), "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
+    EventDto eventToCreate =
+        TestDataFactory.createEventDto(
+            "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
+    EventDto createdEvent =
+        TestDataFactory.createEventDto(
+            UUID.randomUUID(),
+            "New Event",
+            "New Description",
+            now,
+            now.plusHours(1),
+            "New Location",
+            calendarId);
     when(eventService.createEvent(any(EventDto.class))).thenReturn(createdEvent);
 
     // When/Then
@@ -163,10 +175,11 @@ class EventControllerTest {
   @DisplayName("Should return 400 when creating event with invalid data")
   void createEvent_WithInvalidData_ShouldReturn400() throws Exception {
     // Given
-    EventDto invalidEvent = EventDto.builder()
-        .description("Invalid Event")
-        .calendarId(UUID.randomUUID())
-        .build(); // Missing title, start time, and end time
+    EventDto invalidEvent =
+        EventDto.builder()
+            .description("Invalid Event")
+            .calendarId(UUID.randomUUID())
+            .build(); // Missing title, start time, and end time
 
     // When/Then
     mockMvc
@@ -185,8 +198,14 @@ class EventControllerTest {
     // Given
     UUID nonExistentCalendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventToCreate = TestDataFactory.createEventDto(
-        "New Event", "New Description", now, now.plusHours(1), "New Location", nonExistentCalendarId);
+    EventDto eventToCreate =
+        TestDataFactory.createEventDto(
+            "New Event",
+            "New Description",
+            now,
+            now.plusHours(1),
+            "New Location",
+            nonExistentCalendarId);
     when(eventService.createEvent(any(EventDto.class)))
         .thenThrow(new CalendarNotFoundException(nonExistentCalendarId));
 
@@ -208,9 +227,15 @@ class EventControllerTest {
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventToUpdate = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto eventToUpdate =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
     when(eventService.updateEvent(eq(eventId), any(EventDto.class))).thenReturn(eventToUpdate);
 
     // When/Then
@@ -237,9 +262,15 @@ class EventControllerTest {
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventToUpdate = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto eventToUpdate =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
     when(eventService.updateEvent(eq(eventId), any(EventDto.class)))
         .thenThrow(new EventNotFoundException("Event not found with id: " + eventId));
 

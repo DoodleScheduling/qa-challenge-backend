@@ -38,16 +38,21 @@ class CalendarControllerIntegrationTest {
   @Autowired private CalendarService calendarService;
 
   @Test
-  @DisplayName("Should create a calendar and then retrieve it by ID and in the list of all calendars")
+  @DisplayName(
+      "Should create a calendar and then retrieve it by ID and in the list of all calendars")
   void testCreateAndRetrieveCalendar() throws Exception {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
     String calendarJson = objectMapper.writeValueAsString(calendarDto);
 
     // When/Then - Create calendar
     String responseJson =
         mockMvc
-            .perform(post("/api/calendars").contentType(MediaType.APPLICATION_JSON).content(calendarJson))
+            .perform(
+                post("/api/calendars")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(calendarJson))
             .andExpect(status().isCreated())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.name", is("Test Calendar")))
@@ -84,12 +89,14 @@ class CalendarControllerIntegrationTest {
   @DisplayName("Should update a calendar's information")
   void testUpdateCalendar() throws Exception {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Original Calendar", "Original Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Original Calendar", "Original Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     UUID calendarId = createdCalendar.getId();
 
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     // When/Then
@@ -109,7 +116,8 @@ class CalendarControllerIntegrationTest {
   @DisplayName("Should delete a calendar")
   void testDeleteCalendar() throws Exception {
     // Given
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Calendar To Delete", "Delete Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Calendar To Delete", "Delete Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     UUID calendarId = createdCalendar.getId();
 
@@ -130,7 +138,8 @@ class CalendarControllerIntegrationTest {
 
     // When/Then - Update non-existent calendar
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(nonExistentId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            nonExistentId, "Updated Calendar", "Updated Description", null);
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     mockMvc
@@ -154,7 +163,8 @@ class CalendarControllerIntegrationTest {
 
     // When/Then
     mockMvc
-        .perform(post("/api/calendars").contentType(MediaType.APPLICATION_JSON).content(invalidJson))
+        .perform(
+            post("/api/calendars").contentType(MediaType.APPLICATION_JSON).content(invalidJson))
         .andExpect(status().isBadRequest());
   }
 
@@ -182,7 +192,8 @@ class CalendarControllerIntegrationTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.calendars", hasSize(pageSize)))
         .andExpect(jsonPath("$.currentPage", is(pageNumber)))
-        .andExpect(jsonPath("$.totalPages", is((int) Math.ceil((double) totalCalendars / pageSize))));
+        .andExpect(
+            jsonPath("$.totalPages", is((int) Math.ceil((double) totalCalendars / pageSize))));
   }
 
   @Test

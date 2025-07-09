@@ -27,10 +27,7 @@ public class CalendarDto {
    * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
    * conflicts.
    */
-  @JsonIgnore
-  private Long version;
+  @JsonIgnore private Long version;
 
-  @Valid
-  @Builder.Default
-  private List<EventDto> events = new ArrayList<>();
+  @Valid @Builder.Default private List<EventDto> events = new ArrayList<>();
 }

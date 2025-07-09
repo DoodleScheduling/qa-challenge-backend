@@ -97,7 +97,8 @@ public class CalendarService {
       // Check if a calendar with the same name already exists
       if (calendarRepository.findAll().stream()
           .anyMatch(c -> c.getName().equals(calendarDto.getName()))) {
-        throw new DataIntegrityViolationException("Calendar with name '" + calendarDto.getName() + "' already exists");
+        throw new DataIntegrityViolationException(
+            "Calendar with name '" + calendarDto.getName() + "' already exists");
       }
 
       Calendar calendar =
@@ -228,8 +229,8 @@ public class CalendarService {
   }
 
   /**
-   * Maps a Calendar entity to a CalendarDto. Creates a defensive copy of mutable collections to prevent
-   * modification of the entity.
+   * Maps a Calendar entity to a CalendarDto. Creates a defensive copy of mutable collections to
+   * prevent modification of the entity.
    *
    * @param calendar The Calendar entity
    * @return CalendarDto with copied data
@@ -241,9 +242,8 @@ public class CalendarService {
 
     List<EventDto> eventDtos = new ArrayList<>();
     if (calendar.getEvents() != null) {
-      eventDtos = calendar.getEvents().stream()
-          .map(this::mapEventToDto)
-          .collect(Collectors.toList());
+      eventDtos =
+          calendar.getEvents().stream().map(this::mapEventToDto).collect(Collectors.toList());
     }
 
     return CalendarDto.builder()

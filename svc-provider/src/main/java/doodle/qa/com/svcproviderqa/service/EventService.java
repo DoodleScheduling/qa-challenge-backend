@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,6 @@ public class EventService {
 
   private final EventRepository eventRepository;
   private final CalendarRepository calendarRepository;
-
 
   /**
    * Retrieves an event by ID.
@@ -70,7 +67,6 @@ public class EventService {
         .map(this::mapToDto)
         .collect(Collectors.toList());
   }
-
 
   /**
    * Retrieves events for a calendar within a time range.

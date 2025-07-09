@@ -50,7 +50,8 @@ public class CalendarController {
           Integer size) {
 
     Pageable pageable = PageRequest.of(page, size);
-    log.debug("GET request to retrieve all calendars with pagination: page={}, size={}", page, size);
+    log.debug(
+        "GET request to retrieve all calendars with pagination: page={}, size={}", page, size);
 
     Page<CalendarDto> calendarsPage = calendarService.getAllCalendars(pageable);
 
@@ -103,7 +104,8 @@ public class CalendarController {
       content = @Content)
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<CalendarDto> createCalendar(
-      @Parameter(description = "Calendar data", required = true) @Valid @RequestBody CalendarDto calendarDto) {
+      @Parameter(description = "Calendar data", required = true) @Valid @RequestBody
+          CalendarDto calendarDto) {
     log.debug("POST request to create calendar with name: {}", calendarDto.getName());
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     log.info("Created calendar with id: {}", createdCalendar.getId());
@@ -129,7 +131,8 @@ public class CalendarController {
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<CalendarDto> updateCalendar(
       @Parameter(description = "Calendar ID", required = true) @PathVariable UUID id,
-      @Parameter(description = "Calendar data", required = true) @Valid @RequestBody CalendarDto calendarDto) {
+      @Parameter(description = "Calendar data", required = true) @Valid @RequestBody
+          CalendarDto calendarDto) {
     log.debug("PUT request to update calendar with id: {}", id);
     CalendarDto updatedCalendar = calendarService.updateCalendar(id, calendarDto);
     log.info("Updated calendar with id: {}", id);

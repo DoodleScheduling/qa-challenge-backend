@@ -71,7 +71,8 @@ class CalendarRepositoryTest {
   }
 
   @Test
-  @DisplayName("Should return false when checking if calendar exists by name and calendar doesn't exist")
+  @DisplayName(
+      "Should return false when checking if calendar exists by name and calendar doesn't exist")
   void existsByName_WhenCalendarDoesNotExist_ShouldReturnFalse() {
     // Given
     String name = "Nonexistent Calendar";
@@ -87,14 +88,17 @@ class CalendarRepositoryTest {
   @DisplayName("Should save calendar with events")
   void save_WithEvents_ShouldPersistEvents() {
     // Given
-    Calendar calendar = TestDataFactory.createCalendar("Calendar With Events", "Events Description");
+    Calendar calendar =
+        TestDataFactory.createCalendar("Calendar With Events", "Events Description");
     LocalDateTime now = LocalDateTime.now();
-    
-    Event event1 = TestDataFactory.createEvent(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
-    Event event2 = TestDataFactory.createEvent(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
-    
+
+    Event event1 =
+        TestDataFactory.createEvent(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendar);
+    Event event2 =
+        TestDataFactory.createEvent(
+            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendar);
+
     calendar.addEvent(event1);
     calendar.addEvent(event2);
 
@@ -147,14 +151,21 @@ class CalendarRepositoryTest {
   @DisplayName("Should delete events when calendar is deleted")
   void delete_WhenCalendarWithEventsExists_ShouldRemoveCalendarAndEvents() {
     // Given
-    Calendar calendar = TestDataFactory.createCalendar("Calendar With Events To Delete", "Delete Description");
+    Calendar calendar =
+        TestDataFactory.createCalendar("Calendar With Events To Delete", "Delete Description");
     LocalDateTime now = LocalDateTime.now();
-    
-    Event event = TestDataFactory.createEvent(
-        "Event To Delete", "Delete Description", now, now.plusHours(1), "Delete Location", calendar);
-    
+
+    Event event =
+        TestDataFactory.createEvent(
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendar);
+
     calendar.addEvent(event);
-    
+
     Calendar savedCalendar = calendarRepository.save(calendar);
     UUID calendarId = savedCalendar.getId();
     UUID eventId = savedCalendar.getEvents().get(0).getId();

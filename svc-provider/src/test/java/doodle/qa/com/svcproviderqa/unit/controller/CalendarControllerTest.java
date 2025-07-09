@@ -27,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-/** Unit tests for the CalendarController. These tests verify the REST API endpoints using MockMvc. */
+/**
+ * Unit tests for the CalendarController. These tests verify the REST API endpoints using MockMvc.
+ */
 @WebMvcTest(CalendarController.class)
 class CalendarControllerTest {
 
@@ -42,7 +44,8 @@ class CalendarControllerTest {
   void getAllCalendars_WithDefaultPagination_ShouldReturnPagedCalendars() throws Exception {
     // Given
     List<CalendarDto> calendars = TestDataFactory.createCalendarDtoList(3);
-    Page<CalendarDto> calendarPage = new PageImpl<>(calendars, PageRequest.of(0, 20), calendars.size());
+    Page<CalendarDto> calendarPage =
+        new PageImpl<>(calendars, PageRequest.of(0, 20), calendars.size());
 
     // Mock the service to return the page when called with any Pageable
     when(calendarService.getAllCalendars(any(Pageable.class))).thenReturn(calendarPage);
@@ -63,7 +66,8 @@ class CalendarControllerTest {
   }
 
   @Test
-  @DisplayName("Should return paginated calendars when getting calendars with pagination parameters")
+  @DisplayName(
+      "Should return paginated calendars when getting calendars with pagination parameters")
   void getAllCalendars_WithPagination_ShouldReturnPagedCalendars() throws Exception {
     // Given
     List<CalendarDto> calendars = TestDataFactory.createCalendarDtoList(5);
@@ -91,7 +95,8 @@ class CalendarControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.calendars", hasSize(pageSize)))
         .andExpect(jsonPath("$.currentPage", is(pageNumber)))
-        .andExpect(jsonPath("$.totalPages", is((int) Math.ceil((double) calendars.size() / pageSize))));
+        .andExpect(
+            jsonPath("$.totalPages", is((int) Math.ceil((double) calendars.size() / pageSize))));
 
     verify(calendarService).getAllCalendars(any(Pageable.class));
   }
@@ -131,7 +136,8 @@ class CalendarControllerTest {
   void getCalendarById_WhenCalendarExists_ShouldReturnCalendar() throws Exception {
     // Given
     UUID calendarId = UUID.randomUUID();
-    CalendarDto calendar = TestDataFactory.createCalendarDto(calendarId, "Test Calendar", "Test Description", null);
+    CalendarDto calendar =
+        TestDataFactory.createCalendarDto(calendarId, "Test Calendar", "Test Description", null);
     when(calendarService.getCalendarById(calendarId)).thenReturn(calendar);
 
     // When/Then
@@ -151,7 +157,8 @@ class CalendarControllerTest {
   void getCalendarById_WhenCalendarDoesNotExist_ShouldReturn404() throws Exception {
     // Given
     UUID calendarId = UUID.randomUUID();
-    when(calendarService.getCalendarById(calendarId)).thenThrow(new CalendarNotFoundException(calendarId));
+    when(calendarService.getCalendarById(calendarId))
+        .thenThrow(new CalendarNotFoundException(calendarId));
 
     // When/Then
     mockMvc.perform(get("/api/calendars/{id}", calendarId)).andExpect(status().isNotFound());
@@ -163,9 +170,11 @@ class CalendarControllerTest {
   @DisplayName("Should create calendar when creating calendar with valid data")
   void createCalendar_WithValidData_ShouldCreateCalendar() throws Exception {
     // Given
-    CalendarDto calendarToCreate = TestDataFactory.createCalendarDto("New Calendar", "New Description");
+    CalendarDto calendarToCreate =
+        TestDataFactory.createCalendarDto("New Calendar", "New Description");
     CalendarDto createdCalendar =
-        TestDataFactory.createCalendarDto(UUID.randomUUID(), "New Calendar", "New Description", null);
+        TestDataFactory.createCalendarDto(
+            UUID.randomUUID(), "New Calendar", "New Description", null);
     when(calendarService.createCalendar(any(CalendarDto.class))).thenReturn(createdCalendar);
 
     // When/Then
@@ -207,8 +216,10 @@ class CalendarControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarToUpdate =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
-    when(calendarService.updateCalendar(eq(calendarId), any(CalendarDto.class))).thenReturn(calendarToUpdate);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
+    when(calendarService.updateCalendar(eq(calendarId), any(CalendarDto.class)))
+        .thenReturn(calendarToUpdate);
 
     // When/Then
     mockMvc
@@ -231,7 +242,8 @@ class CalendarControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarToUpdate =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     when(calendarService.updateCalendar(eq(calendarId), any(CalendarDto.class)))
         .thenThrow(new CalendarNotFoundException("Calendar not found with id: " + calendarId));
 

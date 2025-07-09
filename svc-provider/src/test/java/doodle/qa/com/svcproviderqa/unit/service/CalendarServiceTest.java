@@ -10,7 +10,6 @@ import doodle.qa.com.svcproviderqa.entity.Calendar;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
-import doodle.qa.com.svcproviderqa.repository.EventRepository;
 import doodle.qa.com.svcproviderqa.service.CalendarService;
 import doodle.qa.com.svcproviderqa.service.EventService;
 import doodle.qa.com.svcproviderqa.util.TestDataFactory;
@@ -27,8 +26,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
- * Unit tests for the CalendarService. These tests verify the business logic in the service layer using
- * mocked dependencies.
+ * Unit tests for the CalendarService. These tests verify the business logic in the service layer
+ * using mocked dependencies.
  */
 @ExtendWith(MockitoExtension.class)
 class CalendarServiceTest {
@@ -63,7 +62,8 @@ class CalendarServiceTest {
   void getCalendarById_WhenCalendarExists_ShouldReturnCalendar() {
     // Given
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(calendar));
 
     // When
@@ -77,14 +77,16 @@ class CalendarServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw CalendarNotFoundException when getting calendar by ID that doesn't exist")
+  @DisplayName(
+      "Should throw CalendarNotFoundException when getting calendar by ID that doesn't exist")
   void getCalendarById_WhenCalendarDoesNotExist_ShouldThrowCalendarNotFoundException() {
     // Given
     UUID calendarId = UUID.randomUUID();
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.empty());
 
     // When/Then
-    assertThrows(CalendarNotFoundException.class, () -> calendarService.getCalendarById(calendarId));
+    assertThrows(
+        CalendarNotFoundException.class, () -> calendarService.getCalendarById(calendarId));
     verify(calendarRepository).findById(calendarId);
   }
 
@@ -118,9 +120,11 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     Calendar existingCalendar =
-        TestDataFactory.createCalendar(calendarId, "Original Calendar", "Original Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Original Calendar", "Original Description", null);
     Calendar updatedCalendar =
         TestDataFactory.createCalendar(calendarId, "Updated Calendar", "Updated Description", null);
 
@@ -145,11 +149,14 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.empty());
 
     // When/Then
-    assertThrows(CalendarNotFoundException.class, () -> calendarService.updateCalendar(calendarId, calendarDto));
+    assertThrows(
+        CalendarNotFoundException.class,
+        () -> calendarService.updateCalendar(calendarId, calendarDto));
     verify(calendarRepository).findById(calendarId);
     verify(calendarRepository, never()).save(any(Calendar.class));
   }
@@ -160,14 +167,18 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null, 2L);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null, 2L);
     Calendar existingCalendar =
-        TestDataFactory.createCalendar(calendarId, "Original Calendar", "Original Description", null, 1L);
+        TestDataFactory.createCalendar(
+            calendarId, "Original Calendar", "Original Description", null, 1L);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> calendarService.updateCalendar(calendarId, calendarDto));
+    assertThrows(
+        ConcurrentModificationException.class,
+        () -> calendarService.updateCalendar(calendarId, calendarDto));
     verify(calendarRepository).findById(calendarId);
     verify(calendarRepository, never()).save(any(Calendar.class));
   }
@@ -178,7 +189,8 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     Calendar existingCalendar =
-        TestDataFactory.createCalendar(calendarId, "Calendar To Delete", "Delete Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Calendar To Delete", "Delete Description", null);
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
 
     // When
@@ -207,10 +219,12 @@ class CalendarServiceTest {
   void createCalendar_WhenOptimisticLockingFailure_ShouldThrowConcurrentModificationException() {
     // Given
     CalendarDto calendarDto = TestDataFactory.createCalendarDto("New Calendar", "New Description");
-    when(calendarRepository.save(any(Calendar.class))).thenThrow(OptimisticLockingFailureException.class);
+    when(calendarRepository.save(any(Calendar.class)))
+        .thenThrow(OptimisticLockingFailureException.class);
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> calendarService.createCalendar(calendarDto));
+    assertThrows(
+        ConcurrentModificationException.class, () -> calendarService.createCalendar(calendarDto));
     verify(calendarRepository).save(any(Calendar.class));
   }
 
@@ -220,15 +234,20 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(
+            calendarId, "Updated Calendar", "Updated Description", null);
     Calendar existingCalendar =
-        TestDataFactory.createCalendar(calendarId, "Original Calendar", "Original Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Original Calendar", "Original Description", null);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
-    when(calendarRepository.save(any(Calendar.class))).thenThrow(OptimisticLockingFailureException.class);
+    when(calendarRepository.save(any(Calendar.class)))
+        .thenThrow(OptimisticLockingFailureException.class);
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> calendarService.updateCalendar(calendarId, calendarDto));
+    assertThrows(
+        ConcurrentModificationException.class,
+        () -> calendarService.updateCalendar(calendarId, calendarDto));
     verify(calendarRepository).findById(calendarId);
     verify(calendarRepository).save(any(Calendar.class));
   }
@@ -239,13 +258,17 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     Calendar existingCalendar =
-        TestDataFactory.createCalendar(calendarId, "Calendar To Delete", "Delete Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Calendar To Delete", "Delete Description", null);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
-    doThrow(OptimisticLockingFailureException.class).when(calendarRepository).delete(any(Calendar.class));
+    doThrow(OptimisticLockingFailureException.class)
+        .when(calendarRepository)
+        .delete(any(Calendar.class));
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> calendarService.deleteCalendar(calendarId));
+    assertThrows(
+        ConcurrentModificationException.class, () -> calendarService.deleteCalendar(calendarId));
     verify(calendarRepository).findById(calendarId);
     verify(calendarRepository).delete(any(Calendar.class));
   }

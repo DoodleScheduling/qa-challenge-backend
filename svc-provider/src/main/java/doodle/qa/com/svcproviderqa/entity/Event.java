@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Event entity representing an event in a calendar. Includes optimistic locking with version field to
- * handle concurrent modifications.
+ * Event entity representing an event in a calendar. Includes optimistic locking with version field
+ * to handle concurrent modifications.
  */
 @Entity
 @Table(name = "events")
@@ -42,15 +42,13 @@ public class Event {
   @Column(nullable = false)
   private LocalDateTime endTime;
 
-  @Column
-  private String location;
+  @Column private String location;
 
   /**
    * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
    * conflicts.
    */
-  @Version 
-  private Long version;
+  @Version private Long version;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "calendar_id")

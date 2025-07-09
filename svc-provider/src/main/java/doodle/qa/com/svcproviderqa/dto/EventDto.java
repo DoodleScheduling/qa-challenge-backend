@@ -34,8 +34,7 @@ public class EventDto {
    * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
    * conflicts.
    */
-  @JsonIgnore
-  private Long version;
+  @JsonIgnore private Long version;
 
   private UUID calendarId;
 }

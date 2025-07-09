@@ -45,17 +45,24 @@ class EventServiceTest {
     eventService = new EventService(eventRepository, calendarRepository);
   }
 
-
   @Test
   @DisplayName("Should return event by ID when event exists")
   void getEventById_WhenEventExists_ShouldReturnEvent() {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
-    Event event = TestDataFactory.createEvent(
-        eventId, "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendar);
+    Event event =
+        TestDataFactory.createEvent(
+            eventId,
+            "Test Event",
+            "Test Description",
+            now,
+            now.plusHours(1),
+            "Test Location",
+            calendar);
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
 
     // When
@@ -89,7 +96,8 @@ class EventServiceTest {
   void getEventsByCalendarId_WhenEventsExist_ShouldReturnEvents() {
     // Given
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     List<Event> events = TestDataFactory.createEventList(3, calendar);
     when(eventRepository.findByCalendarId(calendarId)).thenReturn(events);
 
@@ -106,12 +114,21 @@ class EventServiceTest {
   void createEvent_WhenCalendarExists_ShouldCreateEvent() {
     // Given
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
-    Event savedEvent = TestDataFactory.createEvent(
-        UUID.randomUUID(), "New Event", "New Description", now, now.plusHours(1), "New Location", calendar);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
+    Event savedEvent =
+        TestDataFactory.createEvent(
+            UUID.randomUUID(),
+            "New Event",
+            "New Description",
+            now,
+            now.plusHours(1),
+            "New Location",
+            calendar);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(calendar));
     when(eventRepository.save(any(Event.class))).thenReturn(savedEvent);
@@ -141,13 +158,15 @@ class EventServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw CalendarNotFoundException when creating event with invalid calendar ID")
+  @DisplayName(
+      "Should throw CalendarNotFoundException when creating event with invalid calendar ID")
   void createEvent_WhenCalendarDoesNotExist_ShouldThrowCalendarNotFoundException() {
     // Given
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.empty());
 
@@ -163,20 +182,39 @@ class EventServiceTest {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Original Event", "Original Description", now, now.plusHours(1),
-        "Original Location", calendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendar);
 
-    Event updatedEvent = TestDataFactory.createEvent(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendar);
+    Event updatedEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
     when(eventRepository.save(any(Event.class))).thenReturn(updatedEvent);
@@ -205,9 +243,15 @@ class EventServiceTest {
     UUID calendarId = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
@@ -223,21 +267,37 @@ class EventServiceTest {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId, 2L);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId,
+            2L);
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Original Event", "Original Description", now, now.plusHours(1),
-        "Original Location", calendar, 1L);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendar,
+            1L);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> eventService.updateEvent(eventId, eventDto));
+    assertThrows(
+        ConcurrentModificationException.class, () -> eventService.updateEvent(eventId, eventDto));
     verify(eventRepository).findById(eventId);
     verify(eventRepository, never()).save(any(Event.class));
   }
@@ -250,22 +310,42 @@ class EventServiceTest {
     UUID oldCalendarId = UUID.randomUUID();
     UUID newCalendarId = UUID.randomUUID();
 
-    Calendar oldCalendar = TestDataFactory.createCalendar(oldCalendarId, "Old Calendar", "Old Description", null);
-    Calendar newCalendar = TestDataFactory.createCalendar(newCalendarId, "New Calendar", "New Description", null);
+    Calendar oldCalendar =
+        TestDataFactory.createCalendar(oldCalendarId, "Old Calendar", "Old Description", null);
+    Calendar newCalendar =
+        TestDataFactory.createCalendar(newCalendarId, "New Calendar", "New Description", null);
 
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", newCalendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            newCalendarId);
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Original Event", "Original Description", now, now.plusHours(1),
-        "Original Location", oldCalendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            oldCalendar);
 
-    Event updatedEvent = TestDataFactory.createEvent(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", newCalendar);
+    Event updatedEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            newCalendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
     when(calendarRepository.findById(newCalendarId)).thenReturn(Optional.of(newCalendar));
@@ -284,30 +364,45 @@ class EventServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw CalendarNotFoundException when updating event with invalid calendar ID")
+  @DisplayName(
+      "Should throw CalendarNotFoundException when updating event with invalid calendar ID")
   void updateEvent_WhenNewCalendarDoesNotExist_ShouldThrowCalendarNotFoundException() {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID oldCalendarId = UUID.randomUUID();
     UUID newCalendarId = UUID.randomUUID();
 
-    Calendar oldCalendar = TestDataFactory.createCalendar(oldCalendarId, "Old Calendar", "Old Description", null);
+    Calendar oldCalendar =
+        TestDataFactory.createCalendar(oldCalendarId, "Old Calendar", "Old Description", null);
 
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", newCalendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            newCalendarId);
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Original Event", "Original Description", now, now.plusHours(1),
-        "Original Location", oldCalendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            oldCalendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
     when(calendarRepository.findById(newCalendarId)).thenReturn(Optional.empty());
 
     // When/Then
-    assertThrows(CalendarNotFoundException.class, () -> eventService.updateEvent(eventId, eventDto));
+    assertThrows(
+        CalendarNotFoundException.class, () -> eventService.updateEvent(eventId, eventDto));
     verify(eventRepository).findById(eventId);
     verify(calendarRepository).findById(newCalendarId);
     verify(eventRepository, never()).save(any(Event.class));
@@ -319,12 +414,19 @@ class EventServiceTest {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Event To Delete", "Delete Description", now, now.plusHours(1),
-        "Delete Location", calendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
 
@@ -354,10 +456,12 @@ class EventServiceTest {
   void createEvent_WhenOptimisticLockingFailure_ShouldThrowConcurrentModificationException() {
     // Given
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "New Event", "New Description", now, now.plusHours(1), "New Location", calendarId);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(calendar));
     when(eventRepository.save(any(Event.class))).thenThrow(OptimisticLockingFailureException.class);
@@ -374,22 +478,36 @@ class EventServiceTest {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
 
-    EventDto eventDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", now.plusHours(2), now.plusHours(3),
-        "Updated Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Original Event", "Original Description", now, now.plusHours(1),
-        "Original Location", calendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
     when(eventRepository.save(any(Event.class))).thenThrow(OptimisticLockingFailureException.class);
 
     // When/Then
-    assertThrows(ConcurrentModificationException.class, () -> eventService.updateEvent(eventId, eventDto));
+    assertThrows(
+        ConcurrentModificationException.class, () -> eventService.updateEvent(eventId, eventDto));
     verify(eventRepository).findById(eventId);
     verify(eventRepository).save(any(Event.class));
   }
@@ -400,12 +518,19 @@ class EventServiceTest {
     // Given
     UUID eventId = UUID.randomUUID();
     UUID calendarId = UUID.randomUUID();
-    Calendar calendar = TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+    Calendar calendar =
+        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
     LocalDateTime now = LocalDateTime.now();
 
-    Event existingEvent = TestDataFactory.createEvent(
-        eventId, "Event To Delete", "Delete Description", now, now.plusHours(1),
-        "Delete Location", calendar);
+    Event existingEvent =
+        TestDataFactory.createEvent(
+            eventId,
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendar);
 
     when(eventRepository.findById(eventId)).thenReturn(Optional.of(existingEvent));
     doThrow(OptimisticLockingFailureException.class).when(eventRepository).delete(any(Event.class));

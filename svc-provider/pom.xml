@@ -36,7 +36,6 @@
       <artifactId>spring-aspects</artifactId>
     </dependency>
 
-
     <!-- Database -->
     <dependency>
       <groupId>org.postgresql</groupId>

@@ -11,13 +11,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Calendar entity representing a calendar in the system. Includes optimistic locking with version field to
- * handle concurrent modifications.
+ * Calendar entity representing a calendar in the system. Includes optimistic locking with version
+ * field to handle concurrent modifications.
  */
 @Entity
-@Table(name = "calendars", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "name", name = "uk_calendar_name")
-})
+@Table(
+    name = "calendars",
+    uniqueConstraints = {@UniqueConstraint(columnNames = "name", name = "uk_calendar_name")})
 @Data
 @Builder
 @NoArgsConstructor
@@ -39,24 +39,19 @@ public class Calendar {
    * Version field for optimistic locking. This helps prevent concurrent modifications by detecting
    * conflicts.
    */
-  @Version 
-  private Long version;
+  @Version private Long version;
 
   @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private List<Event> events = new ArrayList<>();
 
-  /**
-   * Helper method to add an event to the calendar
-   */
+  /** Helper method to add an event to the calendar */
   public void addEvent(Event event) {
     events.add(event);
     event.setCalendar(this);
   }
 
-  /**
-   * Helper method to remove an event from the calendar
-   */
+  /** Helper method to remove an event from the calendar */
   public void removeEvent(Event event) {
     events.remove(event);
     event.setCalendar(null);

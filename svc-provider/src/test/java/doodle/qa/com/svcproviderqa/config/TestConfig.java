@@ -1,16 +1,15 @@
 package doodle.qa.com.svcproviderqa.config;
 
+import javax.sql.DataSource;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import javax.sql.DataSource;
-
 /**
- * Test configuration for database components. This configuration provides beans for testing with
- * an embedded H2 database.
+ * Test configuration for database components. This configuration provides beans for testing with an
+ * embedded H2 database.
  */
 @TestConfiguration
 public class TestConfig {

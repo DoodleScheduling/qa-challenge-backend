@@ -45,7 +45,8 @@ class EventServiceIntegrationTest {
     eventRepository.deleteAll();
 
     // Create a test calendar for events
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     calendarId = createdCalendar.getId();
     now = LocalDateTime.now();
@@ -61,9 +62,14 @@ class EventServiceIntegrationTest {
   @DisplayName("Should successfully create an event and persist it in the database")
   void testCreateEvent() {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Integration Test Event", "Integration Test Description", 
-        now, now.plusHours(1), "Integration Test Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Integration Test Event",
+            "Integration Test Description",
+            now,
+            now.plusHours(1),
+            "Integration Test Location",
+            calendarId);
 
     // When
     EventDto createdEvent = eventService.createEvent(eventDto);
@@ -84,15 +90,26 @@ class EventServiceIntegrationTest {
   @DisplayName("Should successfully update an event's information")
   void testUpdateEvent() {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Original Event", "Original Description", 
-        now, now.plusHours(1), "Original Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Original Event",
+            "Original Description",
+            now,
+            now.plusHours(1),
+            "Original Location",
+            calendarId);
     EventDto createdEvent = eventService.createEvent(eventDto);
     UUID eventId = createdEvent.getId();
 
-    EventDto updateDto = TestDataFactory.createEventDto(
-        eventId, "Updated Event", "Updated Description", 
-        now.plusHours(2), now.plusHours(3), "Updated Location", calendarId);
+    EventDto updateDto =
+        TestDataFactory.createEventDto(
+            eventId,
+            "Updated Event",
+            "Updated Description",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Updated Location",
+            calendarId);
     updateDto.setVersion(createdEvent.getVersion()); // Set the version for optimistic locking
 
     // When
@@ -113,9 +130,14 @@ class EventServiceIntegrationTest {
   @DisplayName("Should successfully delete an event from the database")
   void testDeleteEvent() {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Event To Delete", "Delete Description", 
-        now, now.plusHours(1), "Delete Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Event To Delete",
+            "Delete Description",
+            now,
+            now.plusHours(1),
+            "Delete Location",
+            calendarId);
     EventDto createdEvent = eventService.createEvent(eventDto);
     UUID eventId = createdEvent.getId();
 
@@ -126,14 +148,13 @@ class EventServiceIntegrationTest {
     assertThat(eventRepository.findById(eventId)).isEmpty();
   }
 
-
   @Test
   @DisplayName("Should successfully retrieve an event by ID")
   void testGetEventById() {
     // Given
-    EventDto eventDto = TestDataFactory.createEventDto(
-        "Test Event", "Test Description", 
-        now, now.plusHours(1), "Test Location", calendarId);
+    EventDto eventDto =
+        TestDataFactory.createEventDto(
+            "Test Event", "Test Description", now, now.plusHours(1), "Test Location", calendarId);
     EventDto createdEvent = eventService.createEvent(eventDto);
     UUID eventId = createdEvent.getId();
 
@@ -155,9 +176,12 @@ class EventServiceIntegrationTest {
     for (int i = 0; i < totalEvents; i++) {
       eventService.createEvent(
           TestDataFactory.createEventDto(
-              "Event " + i, "Description " + i, 
-              now.plusHours(i), now.plusHours(i + 1), 
-              "Location " + i, calendarId));
+              "Event " + i,
+              "Description " + i,
+              now.plusHours(i),
+              now.plusHours(i + 1),
+              "Location " + i,
+              calendarId));
     }
 
     // When
@@ -171,30 +195,41 @@ class EventServiceIntegrationTest {
     }
   }
 
-
   @Test
   @DisplayName("Should successfully retrieve events by calendar ID and time range")
   void testGetEventsByCalendarIdAndTimeRange() {
     // Given
     // Create a second calendar
-    CalendarDto anotherCalendarDto = TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
+    CalendarDto anotherCalendarDto =
+        TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
     CalendarDto anotherCalendar = calendarService.createCalendar(anotherCalendarDto);
     UUID anotherCalendarId = anotherCalendar.getId();
 
     // Create events in different calendars and times
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 1", "Description 1", 
-        now, now.plusHours(1), "Location 1", calendarId));
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 2", "Description 2", 
-        now.plusHours(2), now.plusHours(3), "Location 2", calendarId));
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 3", "Description 3", 
-        now.plusHours(1), now.plusHours(2), "Location 3", anotherCalendarId));
+    eventService.createEvent(
+        TestDataFactory.createEventDto(
+            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId));
+    eventService.createEvent(
+        TestDataFactory.createEventDto(
+            "Event 2",
+            "Description 2",
+            now.plusHours(2),
+            now.plusHours(3),
+            "Location 2",
+            calendarId));
+    eventService.createEvent(
+        TestDataFactory.createEventDto(
+            "Event 3",
+            "Description 3",
+            now.plusHours(1),
+            now.plusHours(2),
+            "Location 3",
+            anotherCalendarId));
 
     // When
-    List<EventDto> events = eventService.getEventsByCalendarIdAndTimeRange(
-        calendarId, now.minusHours(1), now.plusHours(3));
+    List<EventDto> events =
+        eventService.getEventsByCalendarIdAndTimeRange(
+            calendarId, now.minusHours(1), now.plusHours(3));
 
     // Then
     assertThat(events).hasSize(2);
