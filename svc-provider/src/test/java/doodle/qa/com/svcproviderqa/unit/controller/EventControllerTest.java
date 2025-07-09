@@ -40,64 +40,6 @@ class EventControllerTest {
 
   @MockBean private EventService eventService;
 
-  @Test
-  @DisplayName("Should return all events when getting all events without explicit pagination")
-  void getAllEvents_WithDefaultPagination_ShouldReturnPagedEvents() throws Exception {
-    // Given
-    List<EventDto> events = TestDataFactory.createEventDtoList(3, UUID.randomUUID());
-    Page<EventDto> eventPage = new PageImpl<>(events, PageRequest.of(0, 20), events.size());
-
-    // Mock the service to return the page when called with any Pageable
-    when(eventService.getAllEvents(any(Pageable.class))).thenReturn(eventPage);
-
-    // When/Then
-    mockMvc
-        .perform(get("/api/events"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.events", hasSize(3)))
-        .andExpect(jsonPath("$.events[0].title", is(events.get(0).getTitle())))
-        .andExpect(jsonPath("$.events[1].title", is(events.get(1).getTitle())))
-        .andExpect(jsonPath("$.events[2].title", is(events.get(2).getTitle())))
-        .andExpect(jsonPath("$.totalPages", is(1)))
-        .andExpect(jsonPath("$.currentPage", is(0)));
-
-    verify(eventService).getAllEvents(any(Pageable.class));
-  }
-
-  @Test
-  @DisplayName("Should return paginated events when getting events with pagination parameters")
-  void getAllEvents_WithPagination_ShouldReturnPagedEvents() throws Exception {
-    // Given
-    List<EventDto> events = TestDataFactory.createEventDtoList(5, UUID.randomUUID());
-    int pageSize = 2;
-    int pageNumber = 1; // Second page (0-indexed)
-
-    // Create a Page object with the events
-    Page<EventDto> eventPage =
-        new PageImpl<>(
-            events.subList(
-                pageNumber * pageSize, Math.min((pageNumber + 1) * pageSize, events.size())),
-            PageRequest.of(pageNumber, pageSize),
-            events.size());
-
-    // Mock the service to return the page when called with the pageable parameter
-    when(eventService.getAllEvents(any(Pageable.class))).thenReturn(eventPage);
-
-    // When/Then
-    mockMvc
-        .perform(
-            get("/api/events")
-                .param("page", String.valueOf(pageNumber))
-                .param("size", String.valueOf(pageSize)))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.events", hasSize(pageSize)))
-        .andExpect(jsonPath("$.currentPage", is(pageNumber)))
-        .andExpect(jsonPath("$.totalPages", is((int) Math.ceil((double) events.size() / pageSize))));
-
-    verify(eventService).getAllEvents(any(Pageable.class));
-  }
 
   @Test
   @DisplayName("Should return event when getting event by ID that exists")
@@ -157,33 +99,6 @@ class EventControllerTest {
     verify(eventService).getEventsByCalendarId(calendarId);
   }
 
-  @Test
-  @DisplayName("Should return events when getting events by time range")
-  void getEventsByTimeRange_ShouldReturnEvents() throws Exception {
-    // Given
-    LocalDateTime start = LocalDateTime.now();
-    LocalDateTime end = start.plusDays(7);
-    List<EventDto> events = TestDataFactory.createEventDtoList(3, UUID.randomUUID());
-    when(eventService.getEventsByTimeRange(any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(events);
-
-    // Format dates for URL
-    String startParam = start.format(DateTimeFormatter.ISO_DATE_TIME);
-    String endParam = end.format(DateTimeFormatter.ISO_DATE_TIME);
-
-    // When/Then
-    mockMvc
-        .perform(get("/api/events/timerange")
-            .param("start", startParam)
-            .param("end", endParam))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0].title", is(events.get(0).getTitle())))
-        .andExpect(jsonPath("$[1].title", is(events.get(1).getTitle())))
-        .andExpect(jsonPath("$[2].title", is(events.get(2).getTitle())));
-
-    verify(eventService).getEventsByTimeRange(any(LocalDateTime.class), any(LocalDateTime.class));
-  }
 
   @Test
   @DisplayName("Should return events when getting events by calendar ID and time range")

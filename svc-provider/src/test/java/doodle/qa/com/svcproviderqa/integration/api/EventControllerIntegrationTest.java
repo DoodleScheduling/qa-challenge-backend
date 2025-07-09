@@ -57,7 +57,7 @@ class EventControllerIntegrationTest {
   }
 
   @Test
-  @DisplayName("Should create an event and then retrieve it by ID and in the list of all events")
+  @DisplayName("Should create an event and then retrieve it by ID")
   void testCreateAndRetrieveEvent() throws Exception {
     // Given
     EventDto eventDto = TestDataFactory.createEventDto(
@@ -90,16 +90,6 @@ class EventControllerIntegrationTest {
         .andExpect(jsonPath("$.title", is("Test Event")))
         .andExpect(jsonPath("$.description", is("Test Description")))
         .andExpect(jsonPath("$.calendarId", is(calendarId.toString())));
-
-    // When/Then - Get all events with pagination
-    mockMvc
-        .perform(get("/api/events"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.events", hasSize(1)))
-        .andExpect(jsonPath("$.events[0].id", is(eventId.toString())))
-        .andExpect(jsonPath("$.totalPages").exists())
-        .andExpect(jsonPath("$.currentPage").exists());
   }
 
   @Test
@@ -154,7 +144,7 @@ class EventControllerIntegrationTest {
         "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
     EventDto event2 = TestDataFactory.createEventDto(
         "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendarId);
-    
+
     eventService.createEvent(event1);
     eventService.createEvent(event2);
 
@@ -168,36 +158,6 @@ class EventControllerIntegrationTest {
         .andExpect(jsonPath("$[1].title", is("Event 2")));
   }
 
-  @Test
-  @DisplayName("Should retrieve events by time range")
-  void testGetEventsByTimeRange() throws Exception {
-    // Given
-    EventDto event1 = TestDataFactory.createEventDto(
-        "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
-    EventDto event2 = TestDataFactory.createEventDto(
-        "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendarId);
-    EventDto event3 = TestDataFactory.createEventDto(
-        "Event 3", "Description 3", now.plusHours(4), now.plusHours(5), "Location 3", calendarId);
-    
-    eventService.createEvent(event1);
-    eventService.createEvent(event2);
-    eventService.createEvent(event3);
-
-    // Format dates for URL
-    String startTime = now.minusHours(1).format(DateTimeFormatter.ISO_DATE_TIME);
-    String endTime = now.plusHours(3).format(DateTimeFormatter.ISO_DATE_TIME);
-
-    // When/Then
-    mockMvc
-        .perform(get("/api/events/timerange")
-            .param("start", startTime)
-            .param("end", endTime))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0].title", is("Event 1")))
-        .andExpect(jsonPath("$[1].title", is("Event 2")));
-  }
 
   @Test
   @DisplayName("Should retrieve events by calendar ID and time range")
@@ -207,14 +167,14 @@ class EventControllerIntegrationTest {
     CalendarDto anotherCalendarDto = TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
     CalendarDto anotherCalendar = calendarService.createCalendar(anotherCalendarDto);
     UUID anotherCalendarId = anotherCalendar.getId();
-    
+
     EventDto event1 = TestDataFactory.createEventDto(
         "Event 1", "Description 1", now, now.plusHours(1), "Location 1", calendarId);
     EventDto event2 = TestDataFactory.createEventDto(
         "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", calendarId);
     EventDto event3 = TestDataFactory.createEventDto(
         "Event 3", "Description 3", now.plusHours(1), now.plusHours(2), "Location 3", anotherCalendarId);
-    
+
     eventService.createEvent(event1);
     eventService.createEvent(event2);
     eventService.createEvent(event3);
@@ -291,32 +251,4 @@ class EventControllerIntegrationTest {
         .andExpect(status().isBadRequest());
   }
 
-  @Test
-  @DisplayName("Should retrieve events with explicit pagination parameters")
-  void testGetEventsWithPagination() throws Exception {
-    // Given
-    int totalEvents = 15;
-    int pageSize = 5;
-    int pageNumber = 1; // Second page (0-indexed)
-
-    // Create multiple events
-    for (int i = 0; i < totalEvents; i++) {
-      eventService.createEvent(
-          TestDataFactory.createEventDto(
-              "Event " + i, "Description " + i, now.plusHours(i), now.plusHours(i + 1),
-              "Location " + i, calendarId));
-    }
-
-    // When/Then - Get events with pagination
-    mockMvc
-        .perform(
-            get("/api/events")
-                .param("page", String.valueOf(pageNumber))
-                .param("size", String.valueOf(pageSize)))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.events", hasSize(pageSize)))
-        .andExpect(jsonPath("$.currentPage", is(pageNumber)))
-        .andExpect(jsonPath("$.totalPages", is((int) Math.ceil((double) totalEvents / pageSize))));
-  }
 }

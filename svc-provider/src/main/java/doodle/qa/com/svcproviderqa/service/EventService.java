@@ -38,26 +38,6 @@ public class EventService {
   private final EventRepository eventRepository;
   private final CalendarRepository calendarRepository;
 
-  /**
-   * Retrieves all events with pagination support.
-   *
-   * @param pageable Pagination information
-   * @return Page of EventDto objects
-   */
-  public Page<EventDto> getAllEvents(Pageable pageable) {
-    log.debug("Retrieving all events with pagination: {}", pageable);
-    return eventRepository.findAll(pageable).map(this::mapToDto);
-  }
-
-  /**
-   * Retrieves all events. Note: For large datasets, consider using the paginated version.
-   *
-   * @return List of all EventDto objects
-   */
-  public List<EventDto> getAllEvents() {
-    log.debug("Retrieving all events");
-    return eventRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
-  }
 
   /**
    * Retrieves an event by ID.
@@ -91,19 +71,6 @@ public class EventService {
         .collect(Collectors.toList());
   }
 
-  /**
-   * Retrieves events within a time range.
-   *
-   * @param start Start time
-   * @param end End time
-   * @return List of EventDto objects within the specified time range
-   */
-  public List<EventDto> getEventsByTimeRange(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
-    log.debug("Retrieving events between {} and {}", start, end);
-    return eventRepository.findByStartTimeBetween(start, end).stream()
-        .map(this::mapToDto)
-        .collect(Collectors.toList());
-  }
 
   /**
    * Retrieves events for a calendar within a time range.

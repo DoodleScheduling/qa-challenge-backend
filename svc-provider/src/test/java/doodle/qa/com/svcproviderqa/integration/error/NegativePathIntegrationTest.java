@@ -205,20 +205,6 @@ class NegativePathIntegrationTest {
     assertThat(events).hasSize(0);
   }
 
-  @Test
-  @DisplayName("Should return empty list when getting events for time range with no events")
-  void testGetEventsForEmptyTimeRange() {
-    // Given
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime pastStart = now.minusDays(10);
-    LocalDateTime pastEnd = now.minusDays(9);
-
-    // When
-    List<EventDto> events = eventService.getEventsByTimeRange(pastStart, pastEnd);
-
-    // Then
-    assertThat(events).hasSize(0);
-  }
 
   // Helper method to create a test calendar
   private CalendarDto createTestCalendar() {

@@ -32,45 +32,6 @@ public class EventController {
 
   private final EventService eventService;
 
-  /**
-   * Retrieves all events with pagination.
-   *
-   * @param page Page number (zero-based, optional)
-   * @param size Number of events per page (optional)
-   * @return Simplified response with events and minimal pagination information
-   */
-  @GetMapping
-  @Operation(
-      summary = "Get all events",
-      description =
-          "Retrieves a list of all events with pagination. Use page and size parameters for pagination.")
-  @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
-  public ResponseEntity<Map<String, Object>> getAllEvents(
-      @Parameter(description = "Page number (0-indexed)")
-          @RequestParam(required = false, defaultValue = "0")
-          Integer page,
-      @Parameter(description = "Page size") @RequestParam(required = false, defaultValue = "20")
-          Integer size) {
-
-    Pageable pageable = PageRequest.of(page, size);
-    log.debug("GET request to retrieve all events with pagination: page={}, size={}", page, size);
-
-    Page<EventDto> eventsPage = eventService.getAllEvents(pageable);
-
-    // Create a simplified response with minimal pagination information
-    Map<String, Object> response = new HashMap<>();
-    response.put("events", eventsPage.getContent());
-    response.put("totalPages", eventsPage.getTotalPages());
-    response.put("currentPage", eventsPage.getNumber());
-
-    log.info(
-        "Retrieved {} events (page {} of {})",
-        eventsPage.getNumberOfElements(),
-        eventsPage.getNumber() + 1,
-        eventsPage.getTotalPages());
-
-    return ResponseEntity.ok(response);
-  }
 
   /**
    * Retrieves an event by ID.
@@ -109,32 +70,6 @@ public class EventController {
     return ResponseEntity.ok(events);
   }
 
-  /**
-   * Retrieves events within a time range.
-   *
-   * @param start Start time
-   * @param end End time
-   * @return List of events within the specified time range
-   */
-  @GetMapping("/timerange")
-  @Operation(
-      summary = "Get events by time range",
-      description = "Retrieves all events within a specific time range")
-  @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
-  public ResponseEntity<List<EventDto>> getEventsByTimeRange(
-      @Parameter(description = "Start time", required = true)
-          @RequestParam
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-          LocalDateTime start,
-      @Parameter(description = "End time", required = true)
-          @RequestParam
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-          LocalDateTime end) {
-    log.debug("GET request to retrieve events between {} and {}", start, end);
-    List<EventDto> events = eventService.getEventsByTimeRange(start, end);
-    log.info("Retrieved {} events between {} and {}", events.size(), start, end);
-    return ResponseEntity.ok(events);
-  }
 
   /**
    * Retrieves events for a calendar within a time range.

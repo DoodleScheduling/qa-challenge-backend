@@ -43,7 +43,7 @@ class EventServiceIntegrationTest {
   void setUp() {
     calendarRepository.deleteAll();
     eventRepository.deleteAll();
-    
+
     // Create a test calendar for events
     CalendarDto calendarDto = TestDataFactory.createCalendarDto("Test Calendar", "Test Description");
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
@@ -126,29 +126,6 @@ class EventServiceIntegrationTest {
     assertThat(eventRepository.findById(eventId)).isEmpty();
   }
 
-  @Test
-  @DisplayName("Should successfully retrieve all events")
-  void testGetAllEvents() {
-    // Given
-    int totalEvents = 5;
-    for (int i = 0; i < totalEvents; i++) {
-      eventService.createEvent(
-          TestDataFactory.createEventDto(
-              "Event " + i, "Description " + i, 
-              now.plusHours(i), now.plusHours(i + 1), 
-              "Location " + i, calendarId));
-    }
-
-    // When
-    List<EventDto> events = eventService.getAllEvents();
-
-    // Then
-    assertThat(events).hasSize(totalEvents);
-    for (int i = 0; i < totalEvents; i++) {
-      final int index = i;
-      assertThat(events).anyMatch(e -> e.getTitle().equals("Event " + index));
-    }
-  }
 
   @Test
   @DisplayName("Should successfully retrieve an event by ID")
@@ -194,31 +171,6 @@ class EventServiceIntegrationTest {
     }
   }
 
-  @Test
-  @DisplayName("Should successfully retrieve events by time range")
-  void testGetEventsByTimeRange() {
-    // Given
-    // Create events at different times
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 1", "Description 1", 
-        now, now.plusHours(1), "Location 1", calendarId));
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 2", "Description 2", 
-        now.plusHours(2), now.plusHours(3), "Location 2", calendarId));
-    eventService.createEvent(TestDataFactory.createEventDto(
-        "Event 3", "Description 3", 
-        now.plusHours(4), now.plusHours(5), "Location 3", calendarId));
-
-    // When
-    List<EventDto> events = eventService.getEventsByTimeRange(
-        now.minusHours(1), now.plusHours(3));
-
-    // Then
-    assertThat(events).hasSize(2);
-    assertThat(events).anyMatch(e -> e.getTitle().equals("Event 1"));
-    assertThat(events).anyMatch(e -> e.getTitle().equals("Event 2"));
-    assertThat(events).noneMatch(e -> e.getTitle().equals("Event 3"));
-  }
 
   @Test
   @DisplayName("Should successfully retrieve events by calendar ID and time range")
@@ -228,7 +180,7 @@ class EventServiceIntegrationTest {
     CalendarDto anotherCalendarDto = TestDataFactory.createCalendarDto("Another Calendar", "Another Description");
     CalendarDto anotherCalendar = calendarService.createCalendar(anotherCalendarDto);
     UUID anotherCalendarId = anotherCalendar.getId();
-    
+
     // Create events in different calendars and times
     eventService.createEvent(TestDataFactory.createEventDto(
         "Event 1", "Description 1", 
