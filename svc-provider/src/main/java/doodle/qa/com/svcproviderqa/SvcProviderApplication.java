@@ -1,4 +1,4 @@
-package doodle.qa.com.svcnotificationqa;
+package doodle.qa.com.svcproviderqa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
