@@ -118,7 +118,8 @@ class CalendarServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw CalendarDuplicateNameException when creating calendar with duplicate name")
+  @DisplayName(
+      "Should throw CalendarDuplicateNameException when creating calendar with duplicate name")
   void createCalendar_WithDuplicateName_ShouldThrowCalendarDuplicateNameException() {
     // Given
     String duplicateName = "Duplicate Calendar";

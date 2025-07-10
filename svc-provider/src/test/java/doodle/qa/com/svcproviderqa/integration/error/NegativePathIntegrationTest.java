@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import doodle.qa.com.svcproviderqa.dto.CalendarDto;
 import doodle.qa.com.svcproviderqa.dto.EventDto;
+import doodle.qa.com.svcproviderqa.exception.CalendarDuplicateNameException;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.EventNotFoundException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
@@ -162,7 +163,7 @@ class NegativePathIntegrationTest {
 
   @Test
   @DisplayName(
-      "Should throw DataIntegrityViolationException when creating a calendar with duplicate name")
+      "Should throw CalendarDuplicateNameException when creating a calendar with duplicate name")
   void testCreateCalendarWithDuplicateName() {
     // Given
     String name = "Duplicate Calendar";
@@ -174,7 +175,8 @@ class NegativePathIntegrationTest {
 
     // When/Then
     assertThatThrownBy(() -> calendarService.createCalendar(duplicateCalendar))
-        .isInstanceOf(DataIntegrityViolationException.class);
+        .isInstanceOf(CalendarDuplicateNameException.class)
+        .hasMessageContaining("Calendar with name '" + name + "' already exists");
   }
 
   @Test

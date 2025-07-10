@@ -50,8 +50,7 @@ public class CalendarController {
           Integer size) {
 
     Pageable pageable = PageRequest.of(page, size);
-    log.info(
-        "GET request to retrieve all calendars with pagination: page={}, size={}", page, size);
+    log.info("GET request to retrieve all calendars with pagination: page={}, size={}", page, size);
 
     Page<CalendarDto> calendarsPage = calendarService.getAllCalendars(pageable);
 

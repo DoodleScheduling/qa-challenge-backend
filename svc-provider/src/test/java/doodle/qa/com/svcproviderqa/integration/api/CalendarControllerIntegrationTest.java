@@ -239,22 +239,21 @@ class CalendarControllerIntegrationTest {
   void testCreateCalendarWithDuplicateName() throws Exception {
     // Given
     String duplicateName = "Duplicate Calendar";
-    CalendarDto calendarDto = TestDataFactory.createCalendarDto(duplicateName, "Original Description");
+    CalendarDto calendarDto =
+        TestDataFactory.createCalendarDto(duplicateName, "Original Description");
 
     // Create the first calendar
     calendarService.createCalendar(calendarDto);
 
     // Try to create another calendar with the same name
-    CalendarDto duplicateCalendarDto = 
+    CalendarDto duplicateCalendarDto =
         TestDataFactory.createCalendarDto(duplicateName, "Another Description");
     String duplicateJson = objectMapper.writeValueAsString(duplicateCalendarDto);
 
     // When/Then
     mockMvc
         .perform(
-            post("/api/calendars")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(duplicateJson))
+            post("/api/calendars").contentType(MediaType.APPLICATION_JSON).content(duplicateJson))
         .andExpect(status().isConflict());
   }
 }
