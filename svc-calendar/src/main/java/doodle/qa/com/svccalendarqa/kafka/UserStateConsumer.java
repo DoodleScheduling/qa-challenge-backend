@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -37,11 +38,7 @@ public class UserStateConsumer {
      */
     @KafkaListener(topics = "${kafka.topics.user-state}", groupId = "${spring.kafka.consumer.group-id}")
     @Transactional
-    @Retryable(
-            value = Exception.class,
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2))
-    public void processUserState(UserState userState, Acknowledgment acknowledgment) {
+    public void processUserState(@Payload UserState userState, Acknowledgment acknowledgment) {
         try {
             log.info("Received user state event: {}", userState);
 
@@ -69,7 +66,9 @@ public class UserStateConsumer {
             log.info("Successfully processed user state event: {}", userState);
         } catch (Exception e) {
             log.error("Error processing user state event: {}", userState, e);
-            throw e; // Rethrow to trigger retry
+            // Don't acknowledge the message to let the error handler deal with it
+            // The DefaultErrorHandler configured in KafkaConfig will handle retries and DLT
+            throw e;
         }
     }
 

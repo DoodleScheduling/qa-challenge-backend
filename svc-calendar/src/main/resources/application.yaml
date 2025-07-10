@@ -54,7 +54,6 @@ schema-registry:
 kafka:
   topics:
     user-state: user-state
-    user-state-dlt: user-state.DLT
 
 # Server Configuration
 server:

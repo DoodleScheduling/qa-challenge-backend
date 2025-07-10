@@ -8,11 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
-import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.util.backoff.ExponentialBackOff;
 
 /**
@@ -24,9 +21,6 @@ public class KafkaConfig {
 
     @Value("${kafka.topics.user-state}")
     private String userStateTopic;
-
-    @Value("${kafka.topics.user-state-dlt}")
-    private String userStateDltTopic;
 
     @Value("${spring.retry.kafka.max-attempts}")
     private int maxAttempts;
@@ -41,7 +35,6 @@ public class KafkaConfig {
     private long maxInterval;
 
     private final ConsumerFactory<String, Object> consumerFactory;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * Creates a Kafka listener container factory with error handling.
@@ -53,6 +46,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(errorHandler());
+        factory.getContainerProperties().setAckMode(org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
 
@@ -67,16 +61,6 @@ public class KafkaConfig {
     }
 
     /**
-     * Creates a dead letter topic for user state events.
-     *
-     * @return the user state dead letter topic
-     */
-    @Bean
-    public NewTopic userStateDltTopic() {
-        return TopicBuilder.name(userStateDltTopic).partitions(3).replicas(1).build();
-    }
-
-    /**
      * Creates an error handler for Kafka listeners.
      *
      * @return the error handler
@@ -88,16 +72,6 @@ public class KafkaConfig {
         backOff.setMultiplier(multiplier);
         backOff.setMaxInterval(maxInterval);
 
-        DeadLetterPublishingRecoverer recoverer =
-                new DeadLetterPublishingRecoverer(
-                        kafkaTemplate,
-                        (record, exception) -> {
-                            String originalTopic = record.topic();
-                            return new TopicPartitionOffset(
-                                    originalTopic + ".DLT", record.partition(), record.offset())
-                                    .getTopicPartition();
-                        });
-
-        return new DefaultErrorHandler(recoverer, backOff);
+        return new DefaultErrorHandler(backOff);
     }
 }
