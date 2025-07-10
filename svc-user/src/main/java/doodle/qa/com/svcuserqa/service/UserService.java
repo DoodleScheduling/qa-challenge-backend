@@ -94,6 +94,13 @@ public class UserService {
   public UserDto createUser(@NotNull @Valid UserDto userDto) {
     log.debug("Creating user with email: {}", userDto.getEmail());
 
+    // Check if a user with the same email already exists
+    if (userRepository.existsByEmail(userDto.getEmail())) {
+      log.warn("User with email {} already exists", userDto.getEmail());
+      throw new ConcurrentModificationException(
+          "A user with this email already exists. Please use a different email.");
+    }
+
     try {
       // Defensive copy of calendar IDs
       List<UUID> calendarIdsCopy =
@@ -109,9 +116,12 @@ public class UserService {
               .build();
 
       User savedUser = userRepository.save(user);
-      userStateProducer.sendUserState(savedUser, EventType.CREATED);
 
       log.info("User created: {}", savedUser.getId());
+
+      // Only send Kafka message if user creation was successful
+      userStateProducer.sendUserState(savedUser, EventType.CREATED);
+
       return mapToDto(savedUser);
     } catch (OptimisticLockingFailureException e) {
       // This is unlikely for new entities but could happen in edge cases
@@ -121,6 +131,14 @@ public class UserService {
           e);
       throw new ConcurrentModificationException(
           "A conflict occurred while creating the user. Please try again.", e);
+    } catch (org.springframework.dao.DataIntegrityViolationException e) {
+      // This happens when trying to create a user with a duplicate email
+      log.warn(
+          "Data integrity violation detected while creating user with email: {}",
+          userDto.getEmail(),
+          e);
+      throw new ConcurrentModificationException(
+          "A user with this email already exists. Please use a different email.", e);
     }
   }
 
@@ -174,14 +192,20 @@ public class UserService {
       user.setCalendarIds(calendarIdsCopy);
 
       User updatedUser = userRepository.save(user);
-      userStateProducer.sendUserState(updatedUser, EventType.UPDATED);
 
       log.info("User updated: {}", updatedUser.getId());
+
+      // Only send Kafka message if user update was successful
+      userStateProducer.sendUserState(updatedUser, EventType.UPDATED);
+
       return mapToDto(updatedUser);
     } catch (OptimisticLockingFailureException e) {
       log.warn("Concurrent modification detected while updating user with id: {}", id, e);
       throw new ConcurrentModificationException(
           "The user was modified by another operation. Please refresh and try again.", e);
+    } catch (Exception e) {
+      log.error("Error occurred while updating user with id: {}", id, e);
+      throw e;
     }
   }
 
@@ -211,13 +235,18 @@ public class UserService {
                   });
 
       userRepository.delete(user);
-      userStateProducer.sendUserState(user, EventType.DELETED);
 
       log.info("User deleted: {}", id);
+
+      // Only send Kafka message if user deletion was successful
+      userStateProducer.sendUserState(user, EventType.DELETED);
     } catch (OptimisticLockingFailureException e) {
       log.warn("Concurrent modification detected while deleting user with id: {}", id, e);
       throw new ConcurrentModificationException(
           "The user was modified by another operation. Please refresh and try again.", e);
+    } catch (Exception e) {
+      log.error("Error occurred while deleting user with id: {}", id, e);
+      throw e;
     }
   }
 
@@ -257,9 +286,12 @@ public class UserService {
 
       user.getCalendarIds().add(calendarId);
       User savedUser = userRepository.save(user);
-      userStateProducer.sendUserState(savedUser, EventType.CALENDAR_ADDED);
 
       log.info("Calendar {} added to user {}", calendarId, userId);
+
+      // Only send Kafka message if calendar addition was successful
+      userStateProducer.sendUserState(savedUser, EventType.CALENDAR_ADDED);
+
       return mapToDto(savedUser);
     } catch (OptimisticLockingFailureException e) {
       log.warn(
@@ -269,6 +301,9 @@ public class UserService {
           e);
       throw new ConcurrentModificationException(
           "The user was modified by another operation. Please refresh and try again.", e);
+    } catch (Exception e) {
+      log.error("Error occurred while adding calendar {} to user {}", calendarId, userId, e);
+      throw e;
     }
   }
 
@@ -309,9 +344,12 @@ public class UserService {
       // Remove the calendar and save the user
       user.getCalendarIds().remove(calendarId);
       User savedUser = userRepository.save(user);
-      userStateProducer.sendUserState(savedUser, EventType.CALENDAR_REMOVED);
 
       log.info("Calendar {} removed from user {}", calendarId, userId);
+
+      // Only send Kafka message if calendar removal was successful
+      userStateProducer.sendUserState(savedUser, EventType.CALENDAR_REMOVED);
+
       return mapToDto(savedUser);
     } catch (OptimisticLockingFailureException e) {
       log.warn(
@@ -321,6 +359,9 @@ public class UserService {
           e);
       throw new ConcurrentModificationException(
           "The user was modified by another operation. Please refresh and try again.", e);
+    } catch (Exception e) {
+      log.error("Error occurred while removing calendar {} from user {}", calendarId, userId, e);
+      throw e;
     }
   }
 
