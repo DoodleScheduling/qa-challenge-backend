@@ -39,7 +39,7 @@ public class EventController {
   @ApiResponse(responseCode = "404", description = "Event not found", content = @Content)
   public ResponseEntity<EventDto> getEventById(
       @Parameter(description = "Event ID", required = true) @PathVariable UUID id) {
-    log.debug("GET request to retrieve event with id: {}", id);
+    log.info("GET request to retrieve event with id: {}", id);
     EventDto event = eventService.getEventById(id);
     log.info("Retrieved event with id: {}", id);
     return ResponseEntity.ok(event);
@@ -58,7 +58,7 @@ public class EventController {
   @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
   public ResponseEntity<List<EventDto>> getEventsByCalendarId(
       @Parameter(description = "Calendar ID", required = true) @PathVariable UUID calendarId) {
-    log.debug("GET request to retrieve events for calendar id: {}", calendarId);
+    log.info("GET request to retrieve events for calendar id: {}", calendarId);
     List<EventDto> events = eventService.getEventsByCalendarId(calendarId);
     log.info("Retrieved {} events for calendar id: {}", events.size(), calendarId);
     return ResponseEntity.ok(events);
@@ -87,7 +87,7 @@ public class EventController {
           @RequestParam
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime end) {
-    log.debug(
+    log.info(
         "GET request to retrieve events for calendar {} between {} and {}", calendarId, start, end);
     List<EventDto> events = eventService.getEventsByCalendarIdAndTimeRange(calendarId, start, end);
     log.info(
@@ -118,7 +118,7 @@ public class EventController {
   public ResponseEntity<EventDto> createEvent(
       @Parameter(description = "Event data", required = true) @Valid @RequestBody
           EventDto eventDto) {
-    log.debug("POST request to create event with title: {}", eventDto.getTitle());
+    log.info("POST request to create event with title: {}", eventDto.getTitle());
     EventDto createdEvent = eventService.createEvent(eventDto);
     log.info("Created event with id: {}", createdEvent.getId());
     return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
@@ -145,7 +145,7 @@ public class EventController {
       @Parameter(description = "Event ID", required = true) @PathVariable UUID id,
       @Parameter(description = "Event data", required = true) @Valid @RequestBody
           EventDto eventDto) {
-    log.debug("PUT request to update event with id: {}", id);
+    log.info("PUT request to update event with id: {}", id);
     EventDto updatedEvent = eventService.updateEvent(id, eventDto);
     log.info("Updated event with id: {}", id);
     return ResponseEntity.ok(updatedEvent);
@@ -168,7 +168,7 @@ public class EventController {
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<Void> deleteEvent(
       @Parameter(description = "Event ID", required = true) @PathVariable UUID id) {
-    log.debug("DELETE request to delete event with id: {}", id);
+    log.info("DELETE request to delete event with id: {}", id);
     eventService.deleteEvent(id);
     log.info("Deleted event with id: {}", id);
     return ResponseEntity.noContent().build();

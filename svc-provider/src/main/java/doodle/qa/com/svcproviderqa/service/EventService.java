@@ -44,7 +44,7 @@ public class EventService {
    * @throws EventNotFoundException if event not found
    */
   public EventDto getEventById(@NotNull UUID id) {
-    log.debug("Retrieving event with id: {}", id);
+    log.info("Retrieving event with id: {}", id);
     return eventRepository
         .findById(id)
         .map(this::mapToDto)
@@ -62,7 +62,7 @@ public class EventService {
    * @return List of EventDto objects for the specified calendar ID
    */
   public List<EventDto> getEventsByCalendarId(@NotNull UUID calendarId) {
-    log.debug("Retrieving events for calendar id: {}", calendarId);
+    log.info("Retrieving events for calendar id: {}", calendarId);
     return eventRepository.findByCalendarId(calendarId).stream()
         .map(this::mapToDto)
         .collect(Collectors.toList());
@@ -78,7 +78,7 @@ public class EventService {
    */
   public List<EventDto> getEventsByCalendarIdAndTimeRange(
       @NotNull UUID calendarId, @NotNull LocalDateTime start, @NotNull LocalDateTime end) {
-    log.debug("Retrieving events for calendar {} between {} and {}", calendarId, start, end);
+    log.info("Retrieving events for calendar {} between {} and {}", calendarId, start, end);
     return eventRepository.findByCalendarIdAndStartTimeBetween(calendarId, start, end).stream()
         .map(this::mapToDto)
         .collect(Collectors.toList());
@@ -98,7 +98,7 @@ public class EventService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public EventDto createEvent(@NotNull @Valid EventDto eventDto) {
-    log.debug("Creating event with title: {}", eventDto.getTitle());
+    log.info("Creating event with title: {}", eventDto.getTitle());
 
     try {
       // Find the calendar
@@ -154,7 +154,7 @@ public class EventService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public EventDto updateEvent(@NotNull UUID id, @NotNull @Valid EventDto eventDto) {
-    log.debug("Updating event with id: {}", id);
+    log.info("Updating event with id: {}", id);
 
     try {
       Event event =
@@ -221,7 +221,7 @@ public class EventService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public void deleteEvent(@NotNull UUID id) {
-    log.debug("Deleting event with id: {}", id);
+    log.info("Deleting event with id: {}", id);
 
     try {
       Event event =

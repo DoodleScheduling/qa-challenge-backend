@@ -14,7 +14,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,7 @@ public class CalendarService {
    * @return Page of CalendarDto objects
    */
   public Page<CalendarDto> getAllCalendars(Pageable pageable) {
-    log.debug("Retrieving all calendars with pagination: {}", pageable);
+    log.info("Retrieving all calendars with pagination: {}", pageable);
     return calendarRepository.findAll(pageable).map(this::mapToDto);
   }
 
@@ -52,7 +51,7 @@ public class CalendarService {
    * @return List of all CalendarDto objects
    */
   public List<CalendarDto> getAllCalendars() {
-    log.debug("Retrieving all calendars");
+    log.info("Retrieving all calendars");
     return calendarRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
   }
 
@@ -64,7 +63,7 @@ public class CalendarService {
    * @throws CalendarNotFoundException if calendar not found
    */
   public CalendarDto getCalendarById(@NotNull UUID id) {
-    log.debug("Retrieving calendar with id: {}", id);
+    log.info("Retrieving calendar with id: {}", id);
     return calendarRepository
         .findById(id)
         .map(this::mapToDto)
@@ -88,7 +87,7 @@ public class CalendarService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public CalendarDto createCalendar(@NotNull @Valid CalendarDto calendarDto) {
-    log.debug("Creating calendar with name: {}", calendarDto.getName());
+    log.info("Creating calendar with name: {}", calendarDto.getName());
 
     try {
       // Check if a calendar with the same name already exists
@@ -132,7 +131,7 @@ public class CalendarService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public CalendarDto updateCalendar(@NotNull UUID id, @NotNull @Valid CalendarDto calendarDto) {
-    log.debug("Updating calendar with id: {}", id);
+    log.info("Updating calendar with id: {}", id);
 
     try {
       Calendar calendar =
@@ -183,7 +182,7 @@ public class CalendarService {
       maxAttempts = 3,
       backoff = @Backoff(delay = 500, multiplier = 2))
   public void deleteCalendar(@NotNull UUID id) {
-    log.debug("Deleting calendar with id: {}", id);
+    log.info("Deleting calendar with id: {}", id);
 
     try {
       Calendar calendar =

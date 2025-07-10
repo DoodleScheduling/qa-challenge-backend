@@ -50,7 +50,7 @@ public class CalendarController {
           Integer size) {
 
     Pageable pageable = PageRequest.of(page, size);
-    log.debug(
+    log.info(
         "GET request to retrieve all calendars with pagination: page={}, size={}", page, size);
 
     Page<CalendarDto> calendarsPage = calendarService.getAllCalendars(pageable);
@@ -82,7 +82,7 @@ public class CalendarController {
   @ApiResponse(responseCode = "404", description = "Calendar not found", content = @Content)
   public ResponseEntity<CalendarDto> getCalendarById(
       @Parameter(description = "Calendar ID", required = true) @PathVariable UUID id) {
-    log.debug("GET request to retrieve calendar with id: {}", id);
+    log.info("GET request to retrieve calendar with id: {}", id);
     CalendarDto calendar = calendarService.getCalendarById(id);
     log.info("Retrieved calendar with id: {}", id);
     return ResponseEntity.ok(calendar);
@@ -106,7 +106,7 @@ public class CalendarController {
   public ResponseEntity<CalendarDto> createCalendar(
       @Parameter(description = "Calendar data", required = true) @Valid @RequestBody
           CalendarDto calendarDto) {
-    log.debug("POST request to create calendar with name: {}", calendarDto.getName());
+    log.info("POST request to create calendar with name: {}", calendarDto.getName());
     CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
     log.info("Created calendar with id: {}", createdCalendar.getId());
     return new ResponseEntity<>(createdCalendar, HttpStatus.CREATED);
@@ -133,7 +133,7 @@ public class CalendarController {
       @Parameter(description = "Calendar ID", required = true) @PathVariable UUID id,
       @Parameter(description = "Calendar data", required = true) @Valid @RequestBody
           CalendarDto calendarDto) {
-    log.debug("PUT request to update calendar with id: {}", id);
+    log.info("PUT request to update calendar with id: {}", id);
     CalendarDto updatedCalendar = calendarService.updateCalendar(id, calendarDto);
     log.info("Updated calendar with id: {}", id);
     return ResponseEntity.ok(updatedCalendar);
@@ -156,7 +156,7 @@ public class CalendarController {
   @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   public ResponseEntity<Void> deleteCalendar(
       @Parameter(description = "Calendar ID", required = true) @PathVariable UUID id) {
-    log.debug("DELETE request to delete calendar with id: {}", id);
+    log.info("DELETE request to delete calendar with id: {}", id);
     calendarService.deleteCalendar(id);
     log.info("Deleted calendar with id: {}", id);
     return ResponseEntity.noContent().build();
