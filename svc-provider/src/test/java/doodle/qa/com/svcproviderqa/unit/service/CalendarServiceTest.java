@@ -11,8 +11,8 @@ import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
 import doodle.qa.com.svcproviderqa.service.CalendarService;
-import doodle.qa.com.svcproviderqa.service.EventService;
 import doodle.qa.com.svcproviderqa.util.TestDataFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,13 +33,12 @@ import org.springframework.dao.OptimisticLockingFailureException;
 class CalendarServiceTest {
 
   @Mock private CalendarRepository calendarRepository;
-  @Mock private EventService eventService;
 
   private CalendarService calendarService;
 
   @BeforeEach
   void setUp() {
-    calendarService = new CalendarService(calendarRepository, eventService);
+    calendarService = new CalendarService(calendarRepository);
   }
 
   @Test
@@ -63,7 +62,8 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     Calendar calendar =
-        TestDataFactory.createCalendar(calendarId, "Test Calendar", "Test Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Test Calendar", "Test Description", new ArrayList<>());
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(calendar));
 
     // When
@@ -96,7 +96,8 @@ class CalendarServiceTest {
     // Given
     CalendarDto calendarDto = TestDataFactory.createCalendarDto("New Calendar", "New Description");
     Calendar savedCalendar =
-        TestDataFactory.createCalendar(UUID.randomUUID(), "New Calendar", "New Description", null);
+        TestDataFactory.createCalendar(
+            UUID.randomUUID(), "New Calendar", "New Description", new ArrayList<>());
     when(calendarRepository.save(any(Calendar.class))).thenReturn(savedCalendar);
 
     // When
@@ -120,13 +121,13 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     Calendar existingCalendar =
         TestDataFactory.createCalendar(
-            calendarId, "Original Calendar", "Original Description", null);
+            calendarId, "Original Calendar", "Original Description", new ArrayList<>());
     Calendar updatedCalendar =
-        TestDataFactory.createCalendar(calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendar(
+            calendarId, "Updated Calendar", "Updated Description", new ArrayList<>());
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
     when(calendarRepository.save(any(Calendar.class))).thenReturn(updatedCalendar);
@@ -149,8 +150,7 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.empty());
 
     // When/Then
@@ -168,10 +168,10 @@ class CalendarServiceTest {
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
         TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null, 2L);
+            calendarId, "Updated Calendar", "Updated Description", 2L);
     Calendar existingCalendar =
         TestDataFactory.createCalendar(
-            calendarId, "Original Calendar", "Original Description", null, 1L);
+            calendarId, "Original Calendar", "Original Description", new ArrayList<>(), 1L);
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
 
@@ -190,7 +190,7 @@ class CalendarServiceTest {
     UUID calendarId = UUID.randomUUID();
     Calendar existingCalendar =
         TestDataFactory.createCalendar(
-            calendarId, "Calendar To Delete", "Delete Description", null);
+            calendarId, "Calendar To Delete", "Delete Description", new ArrayList<>());
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
 
     // When
@@ -234,11 +234,10 @@ class CalendarServiceTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     Calendar existingCalendar =
         TestDataFactory.createCalendar(
-            calendarId, "Original Calendar", "Original Description", null);
+            calendarId, "Original Calendar", "Original Description", new ArrayList<>());
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
     when(calendarRepository.save(any(Calendar.class)))
@@ -259,7 +258,7 @@ class CalendarServiceTest {
     UUID calendarId = UUID.randomUUID();
     Calendar existingCalendar =
         TestDataFactory.createCalendar(
-            calendarId, "Calendar To Delete", "Delete Description", null);
+            calendarId, "Calendar To Delete", "Delete Description", new ArrayList<>());
 
     when(calendarRepository.findById(calendarId)).thenReturn(Optional.of(existingCalendar));
     doThrow(OptimisticLockingFailureException.class)

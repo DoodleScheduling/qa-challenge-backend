@@ -7,8 +7,6 @@ import doodle.qa.com.svcproviderqa.entity.Calendar;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
 import doodle.qa.com.svcproviderqa.service.CalendarService;
 import doodle.qa.com.svcproviderqa.util.TestDataFactory;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -74,8 +72,7 @@ class CalendarServiceIntegrationTest {
     UUID calendarId = createdCalendar.getId();
 
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     updateDto.setVersion(createdCalendar.getVersion()); // Set the version for optimistic locking
 
     // When
@@ -143,37 +140,5 @@ class CalendarServiceIntegrationTest {
     assertThat(retrievedCalendar.getId()).isEqualTo(calendarId);
     assertThat(retrievedCalendar.getName()).isEqualTo("Test Calendar");
     assertThat(retrievedCalendar.getDescription()).isEqualTo("Test Description");
-  }
-
-  @Test
-  @DisplayName("Should successfully create a calendar with events")
-  void testCreateCalendarWithEvents() {
-    // Given
-    List<doodle.qa.com.svcproviderqa.dto.EventDto> events = new ArrayList<>();
-    LocalDateTime now = java.time.LocalDateTime.now();
-
-    events.add(
-        TestDataFactory.createEventDto(
-            "Event 1", "Description 1", now, now.plusHours(1), "Location 1", null));
-    events.add(
-        TestDataFactory.createEventDto(
-            "Event 2", "Description 2", now.plusHours(2), now.plusHours(3), "Location 2", null));
-
-    CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto("Calendar With Events", "Events Description", events);
-
-    // When
-    CalendarDto createdCalendar = calendarService.createCalendar(calendarDto);
-
-    // Then
-    assertThat(createdCalendar.getId()).isNotNull();
-    assertThat(createdCalendar.getName()).isEqualTo("Calendar With Events");
-    assertThat(createdCalendar.getEvents()).hasSize(2);
-
-    Calendar savedCalendar = calendarRepository.findById(createdCalendar.getId()).orElseThrow();
-    assertThat(savedCalendar.getName()).isEqualTo("Calendar With Events");
-    assertThat(savedCalendar.getEvents()).hasSize(2);
-    assertThat(savedCalendar.getEvents().get(0).getTitle()).isEqualTo("Event 1");
-    assertThat(savedCalendar.getEvents().get(1).getTitle()).isEqualTo("Event 2");
   }
 }

@@ -78,80 +78,60 @@ public class TestDataFactory {
   }
 
   /**
-   * Creates a CalendarDto with the given ID, name, description, events, and version.
+   * Creates a CalendarDto with the given ID, name, description, and version.
    *
    * @param id The calendar ID
    * @param name The calendar name
    * @param description The calendar description
-   * @param events The list of event DTOs
    * @param version The version for optimistic locking
    * @return A CalendarDto
    */
   public static CalendarDto createCalendarDto(
-      UUID id, String name, String description, List<EventDto> events, Long version) {
+      UUID id, String name, String description, Long version) {
     return CalendarDto.builder()
         .id(id)
         .name(name)
         .description(description)
-        .events(events != null ? events : new ArrayList<>())
         .version(version)
         .build();
   }
 
   /**
-   * Creates a CalendarDto with the given ID, name, description, and events. The version will be
-   * null, which is appropriate for new calendars that haven't been persisted yet.
+   * Creates a CalendarDto with the given ID, name, and description. The version will be null, which
+   * is appropriate for new calendars that haven't been persisted yet.
    *
    * @param id The calendar ID
    * @param name The calendar name
    * @param description The calendar description
-   * @param events The list of event DTOs
    * @return A CalendarDto
    */
-  public static CalendarDto createCalendarDto(
-      UUID id, String name, String description, List<EventDto> events) {
-    return createCalendarDto(id, name, description, events, null);
+  public static CalendarDto createCalendarDto(UUID id, String name, String description) {
+    return createCalendarDto(id, name, description, null);
   }
 
   /**
-   * Creates a CalendarDto with the given name, description, events, and version. The ID will be
-   * null, which is appropriate for new calendars that haven't been persisted yet.
+   * Creates a CalendarDto with the given name, description, and version. The ID will be null, which
+   * is appropriate for new calendars that haven't been persisted yet.
    *
    * @param name The calendar name
    * @param description The calendar description
-   * @param events The list of event DTOs
    * @param version The version for optimistic locking
    * @return A CalendarDto
    */
-  public static CalendarDto createCalendarDto(
-      String name, String description, List<EventDto> events, Long version) {
-    return createCalendarDto(null, name, description, events, version);
+  public static CalendarDto createCalendarDto(String name, String description, Long version) {
+    return createCalendarDto(null, name, description, version);
   }
 
   /**
-   * Creates a CalendarDto with the given name, description, and events. The ID and version will be
-   * null, which is appropriate for new calendars that haven't been persisted yet.
-   *
-   * @param name The calendar name
-   * @param description The calendar description
-   * @param events The list of event DTOs
-   * @return A CalendarDto
-   */
-  public static CalendarDto createCalendarDto(
-      String name, String description, List<EventDto> events) {
-    return createCalendarDto(null, name, description, events, null);
-  }
-
-  /**
-   * Creates a CalendarDto with the given name and description. The ID and version will be null, and
-   * the events list will be empty.
+   * Creates a CalendarDto with the given name and description. The ID and version will be null,
+   * which is appropriate for new calendars that haven't been persisted yet.
    *
    * @param name The calendar name
    * @param description The calendar description
    * @return A CalendarDto
    */
   public static CalendarDto createCalendarDto(String name, String description) {
-    return createCalendarDto(null, name, description, new ArrayList<>(), null);
+    return createCalendarDto(null, name, description, null);
   }
 
   /**
@@ -355,7 +335,6 @@ public class TestDataFactory {
               UUID.randomUUID(),
               "Calendar " + i,
               "Description for calendar " + i,
-              new ArrayList<>(),
               0L // Initialize with version 0
               ));
     }

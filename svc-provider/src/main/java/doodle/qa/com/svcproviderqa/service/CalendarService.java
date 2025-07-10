@@ -1,15 +1,12 @@
 package doodle.qa.com.svcproviderqa.service;
 
 import doodle.qa.com.svcproviderqa.dto.CalendarDto;
-import doodle.qa.com.svcproviderqa.dto.EventDto;
 import doodle.qa.com.svcproviderqa.entity.Calendar;
-import doodle.qa.com.svcproviderqa.entity.Event;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -36,7 +33,6 @@ import org.springframework.validation.annotation.Validated;
 public class CalendarService {
 
   private final CalendarRepository calendarRepository;
-  private final EventService eventService;
 
   /**
    * Retrieves all calendars with pagination support.
@@ -109,27 +105,8 @@ public class CalendarService {
 
       Calendar savedCalendar = calendarRepository.save(calendar);
 
-      // Process events if any
-      List<EventDto> createdEvents = new ArrayList<>();
-      if (calendarDto.getEvents() != null && !calendarDto.getEvents().isEmpty()) {
-        for (EventDto eventDto : calendarDto.getEvents()) {
-          eventDto.setCalendarId(savedCalendar.getId());
-          EventDto createdEvent = eventService.createEvent(eventDto);
-          createdEvents.add(createdEvent);
-        }
-        // Refresh the calendar to get the events
-        savedCalendar = calendarRepository.findById(savedCalendar.getId()).orElse(savedCalendar);
-      }
-
       log.info("Calendar created: {}", savedCalendar.getId());
-      CalendarDto result = mapToDto(savedCalendar);
-
-      // If we created events, use them in the result
-      if (!createdEvents.isEmpty()) {
-        result.setEvents(createdEvents);
-      }
-
-      return result;
+      return mapToDto(savedCalendar);
     } catch (OptimisticLockingFailureException e) {
       log.warn(
           "Concurrent modification detected while creating calendar with name: {}",
@@ -229,8 +206,7 @@ public class CalendarService {
   }
 
   /**
-   * Maps a Calendar entity to a CalendarDto. Creates a defensive copy of mutable collections to
-   * prevent modification of the entity.
+   * Maps a Calendar entity to a CalendarDto.
    *
    * @param calendar The Calendar entity
    * @return CalendarDto with copied data
@@ -240,41 +216,11 @@ public class CalendarService {
       return null;
     }
 
-    List<EventDto> eventDtos = new ArrayList<>();
-    if (calendar.getEvents() != null) {
-      eventDtos =
-          calendar.getEvents().stream().map(this::mapEventToDto).collect(Collectors.toList());
-    }
-
     return CalendarDto.builder()
         .id(calendar.getId())
         .name(calendar.getName())
         .description(calendar.getDescription())
         .version(calendar.getVersion())
-        .events(eventDtos)
-        .build();
-  }
-
-  /**
-   * Maps an Event entity to an EventDto.
-   *
-   * @param event The Event entity
-   * @return EventDto with copied data
-   */
-  private EventDto mapEventToDto(Event event) {
-    if (event == null) {
-      return null;
-    }
-
-    return EventDto.builder()
-        .id(event.getId())
-        .title(event.getTitle())
-        .description(event.getDescription())
-        .startTime(event.getStartTime())
-        .endTime(event.getEndTime())
-        .location(event.getLocation())
-        .version(event.getVersion())
-        .calendarId(event.getCalendar() != null ? event.getCalendar().getId() : null)
         .build();
   }
 }

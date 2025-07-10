@@ -137,7 +137,7 @@ class CalendarControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendar =
-        TestDataFactory.createCalendarDto(calendarId, "Test Calendar", "Test Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Test Calendar", "Test Description");
     when(calendarService.getCalendarById(calendarId)).thenReturn(calendar);
 
     // When/Then
@@ -173,8 +173,7 @@ class CalendarControllerTest {
     CalendarDto calendarToCreate =
         TestDataFactory.createCalendarDto("New Calendar", "New Description");
     CalendarDto createdCalendar =
-        TestDataFactory.createCalendarDto(
-            UUID.randomUUID(), "New Calendar", "New Description", null);
+        TestDataFactory.createCalendarDto(UUID.randomUUID(), "New Calendar", "New Description");
     when(calendarService.createCalendar(any(CalendarDto.class))).thenReturn(createdCalendar);
 
     // When/Then
@@ -216,8 +215,7 @@ class CalendarControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarToUpdate =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     when(calendarService.updateCalendar(eq(calendarId), any(CalendarDto.class)))
         .thenReturn(calendarToUpdate);
 
@@ -242,8 +240,7 @@ class CalendarControllerTest {
     // Given
     UUID calendarId = UUID.randomUUID();
     CalendarDto calendarToUpdate =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     when(calendarService.updateCalendar(eq(calendarId), any(CalendarDto.class)))
         .thenThrow(new CalendarNotFoundException("Calendar not found with id: " + calendarId));
 

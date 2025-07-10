@@ -95,8 +95,7 @@ class CalendarControllerIntegrationTest {
     UUID calendarId = createdCalendar.getId();
 
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(
-            calendarId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(calendarId, "Updated Calendar", "Updated Description");
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     // When/Then
@@ -138,8 +137,7 @@ class CalendarControllerIntegrationTest {
 
     // When/Then - Update non-existent calendar
     CalendarDto updateDto =
-        TestDataFactory.createCalendarDto(
-            nonExistentId, "Updated Calendar", "Updated Description", null);
+        TestDataFactory.createCalendarDto(nonExistentId, "Updated Calendar", "Updated Description");
     String updateJson = objectMapper.writeValueAsString(updateDto);
 
     mockMvc

@@ -1,10 +1,7 @@
 package doodle.qa.com.svcproviderqa.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +25,4 @@ public class CalendarDto {
    * conflicts.
    */
   @JsonIgnore private Long version;
-
-  @Valid @Builder.Default private List<EventDto> events = new ArrayList<>();
 }

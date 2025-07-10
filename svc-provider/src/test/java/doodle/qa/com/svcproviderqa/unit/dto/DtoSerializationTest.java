@@ -25,7 +25,7 @@ class DtoSerializationTest {
     // Given
     UUID id = UUID.randomUUID();
     CalendarDto calendarDto =
-        TestDataFactory.createCalendarDto(id, "Test Calendar", "Test Description", null, 123L);
+        TestDataFactory.createCalendarDto(id, "Test Calendar", "Test Description", 123L);
 
     // When
     String json = objectMapper.writeValueAsString(calendarDto);
