@@ -2,6 +2,7 @@ package doodle.qa.com.svcproviderqa.service;
 
 import doodle.qa.com.svcproviderqa.dto.CalendarDto;
 import doodle.qa.com.svcproviderqa.entity.Calendar;
+import doodle.qa.com.svcproviderqa.exception.CalendarDuplicateNameException;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
@@ -93,8 +94,7 @@ public class CalendarService {
       // Check if a calendar with the same name already exists
       if (calendarRepository.findAll().stream()
           .anyMatch(c -> c.getName().equals(calendarDto.getName()))) {
-        throw new DataIntegrityViolationException(
-            "Calendar with name '" + calendarDto.getName() + "' already exists");
+        throw new CalendarDuplicateNameException(calendarDto.getName());
       }
 
       Calendar calendar =

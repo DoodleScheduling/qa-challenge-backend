@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import doodle.qa.com.svcproviderqa.dto.CalendarDto;
 import doodle.qa.com.svcproviderqa.entity.Calendar;
+import doodle.qa.com.svcproviderqa.exception.CalendarDuplicateNameException;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcproviderqa.repository.CalendarRepository;
@@ -98,6 +99,7 @@ class CalendarServiceTest {
     Calendar savedCalendar =
         TestDataFactory.createCalendar(
             UUID.randomUUID(), "New Calendar", "New Description", new ArrayList<>());
+    when(calendarRepository.findAll()).thenReturn(new ArrayList<>());
     when(calendarRepository.save(any(Calendar.class))).thenReturn(savedCalendar);
 
     // When
@@ -113,6 +115,26 @@ class CalendarServiceTest {
     Calendar capturedCalendar = calendarCaptor.getValue();
     assertThat(capturedCalendar.getName()).isEqualTo("New Calendar");
     assertThat(capturedCalendar.getDescription()).isEqualTo("New Description");
+  }
+
+  @Test
+  @DisplayName("Should throw CalendarDuplicateNameException when creating calendar with duplicate name")
+  void createCalendar_WithDuplicateName_ShouldThrowCalendarDuplicateNameException() {
+    // Given
+    String duplicateName = "Duplicate Calendar";
+    CalendarDto calendarDto = TestDataFactory.createCalendarDto(duplicateName, "Some Description");
+
+    List<Calendar> existingCalendars = new ArrayList<>();
+    existingCalendars.add(
+        TestDataFactory.createCalendar(
+            UUID.randomUUID(), duplicateName, "Existing Description", new ArrayList<>()));
+    when(calendarRepository.findAll()).thenReturn(existingCalendars);
+
+    // When/Then
+    assertThrows(
+        CalendarDuplicateNameException.class, () -> calendarService.createCalendar(calendarDto));
+    verify(calendarRepository).findAll();
+    verify(calendarRepository, never()).save(any(Calendar.class));
   }
 
   @Test

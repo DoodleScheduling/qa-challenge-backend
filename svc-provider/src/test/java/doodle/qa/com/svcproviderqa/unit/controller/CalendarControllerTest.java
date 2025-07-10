@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import doodle.qa.com.svcproviderqa.controller.CalendarController;
 import doodle.qa.com.svcproviderqa.dto.CalendarDto;
+import doodle.qa.com.svcproviderqa.exception.CalendarDuplicateNameException;
 import doodle.qa.com.svcproviderqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcproviderqa.service.CalendarService;
 import doodle.qa.com.svcproviderqa.util.TestDataFactory;
@@ -207,6 +208,27 @@ class CalendarControllerTest {
         .andExpect(status().isBadRequest());
 
     verify(calendarService, never()).createCalendar(any(CalendarDto.class));
+  }
+
+  @Test
+  @DisplayName("Should return 409 when creating calendar with duplicate name")
+  void createCalendar_WithDuplicateName_ShouldReturn409() throws Exception {
+    // Given
+    String duplicateName = "Duplicate Calendar";
+    CalendarDto calendarWithDuplicateName =
+        TestDataFactory.createCalendarDto(duplicateName, "Some Description");
+    when(calendarService.createCalendar(any(CalendarDto.class)))
+        .thenThrow(new CalendarDuplicateNameException(duplicateName));
+
+    // When/Then
+    mockMvc
+        .perform(
+            post("/api/calendars")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(calendarWithDuplicateName)))
+        .andExpect(status().isConflict());
+
+    verify(calendarService).createCalendar(any(CalendarDto.class));
   }
 
   @Test

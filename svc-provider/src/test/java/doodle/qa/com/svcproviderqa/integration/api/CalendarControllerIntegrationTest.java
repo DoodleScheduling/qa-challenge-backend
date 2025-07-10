@@ -233,4 +233,28 @@ class CalendarControllerIntegrationTest {
         .andExpect(jsonPath("$.totalPages", is(1)))
         .andExpect(jsonPath("$.currentPage", is(10)));
   }
+
+  @Test
+  @DisplayName("Should return 409 when creating a calendar with duplicate name")
+  void testCreateCalendarWithDuplicateName() throws Exception {
+    // Given
+    String duplicateName = "Duplicate Calendar";
+    CalendarDto calendarDto = TestDataFactory.createCalendarDto(duplicateName, "Original Description");
+
+    // Create the first calendar
+    calendarService.createCalendar(calendarDto);
+
+    // Try to create another calendar with the same name
+    CalendarDto duplicateCalendarDto = 
+        TestDataFactory.createCalendarDto(duplicateName, "Another Description");
+    String duplicateJson = objectMapper.writeValueAsString(duplicateCalendarDto);
+
+    // When/Then
+    mockMvc
+        .perform(
+            post("/api/calendars")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(duplicateJson))
+        .andExpect(status().isConflict());
+  }
 }
