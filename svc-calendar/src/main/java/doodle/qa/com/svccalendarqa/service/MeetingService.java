@@ -349,24 +349,32 @@ public class MeetingService {
    */
   private void checkForConflicts(
       UUID calendarId, LocalDateTime startTime, LocalDateTime endTime, UUID excludeMeetingId) {
-    // Get the UserCalendar for this calendar ID
-    UserCalendar userCalendar =
-        userCalendarRepository
-            .findByCalendarId(calendarId)
-            .orElseThrow(() -> new CalendarNotFoundException(calendarId));
+    // Get all UserCalendars for this calendar ID
+    List<UserCalendar> userCalendars = userCalendarRepository.findAllByCalendarId(calendarId);
 
-    List<Meeting> overlappingMeetings =
-        meetingRepository.findOverlappingMeetingsByUserCalendar(userCalendar, startTime, endTime);
-
-    // Filter out the meeting being updated
-    if (excludeMeetingId != null) {
-      overlappingMeetings =
-          overlappingMeetings.stream()
-              .filter(meeting -> !meeting.getId().equals(excludeMeetingId))
-              .collect(Collectors.toList());
+    if (userCalendars.isEmpty()) {
+      throw new CalendarNotFoundException(calendarId);
     }
 
-    if (!overlappingMeetings.isEmpty()) {
+    List<Meeting> allOverlappingMeetings = new ArrayList<>();
+
+    // Check for conflicts in all user calendars with this calendar ID
+    for (UserCalendar userCalendar : userCalendars) {
+      List<Meeting> overlappingMeetings =
+          meetingRepository.findOverlappingMeetingsByUserCalendar(userCalendar, startTime, endTime);
+
+      // Filter out the meeting being updated
+      if (excludeMeetingId != null) {
+        overlappingMeetings =
+            overlappingMeetings.stream()
+                .filter(meeting -> !meeting.getId().equals(excludeMeetingId))
+                .collect(Collectors.toList());
+      }
+
+      allOverlappingMeetings.addAll(overlappingMeetings);
+    }
+
+    if (!allOverlappingMeetings.isEmpty()) {
       throw new IllegalArgumentException("The meeting conflicts with existing meetings");
     }
 

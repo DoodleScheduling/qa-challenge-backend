@@ -42,6 +42,16 @@ public interface UserCalendarRepository extends JpaRepository<UserCalendar, UUID
    *
    * @param calendarId the calendar ID
    * @return an optional user calendar
+   * @deprecated Use findAllByCalendarId instead to support many-to-many relationships
    */
+  @Deprecated
   Optional<UserCalendar> findByCalendarId(UUID calendarId);
+
+  /**
+   * Find all calendars by calendar ID.
+   *
+   * @param calendarId the calendar ID
+   * @return a list of user calendars
+   */
+  List<UserCalendar> findAllByCalendarId(UUID calendarId);
 }

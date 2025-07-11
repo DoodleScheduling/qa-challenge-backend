@@ -7,7 +7,6 @@ import doodle.qa.com.svccalendarqa.repository.UserCalendarRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -97,13 +96,17 @@ public class UserStateConsumer {
 
     // Create or update user calendars
     for (UUID calendarId : calendarIds) {
-      UserCalendar userCalendar =
-          userCalendarRepository
-              .findByCalendarId(calendarId)
-              .orElse(UserCalendar.builder().calendarId(calendarId).userId(userId).build());
-
-      userCalendarRepository.save(userCalendar);
-      log.info("User calendar created/updated: {}", userCalendar);
+      // Check if this user-calendar association already exists
+      if (!userCalendarRepository.existsByCalendarIdAndUserId(calendarId, userId)) {
+        // Create a new user-calendar association
+        UserCalendar userCalendar =
+            UserCalendar.builder().calendarId(calendarId).userId(userId).build();
+        userCalendarRepository.save(userCalendar);
+        log.info("User calendar created: {}", userCalendar);
+      } else {
+        log.info(
+            "User calendar already exists for user ID: {} and calendar ID: {}", userId, calendarId);
+      }
     }
 
     // Remove any calendars that are no longer associated with the user
@@ -145,8 +148,7 @@ public class UserStateConsumer {
     List<UUID> calendarIds = new ArrayList<>();
     if (!userState.getCalendarIds().isEmpty()) {
       // Convert string calendar IDs to UUID
-      calendarIds =
-          userState.getCalendarIds().stream().map(UUID::fromString).toList();
+      calendarIds = userState.getCalendarIds().stream().map(UUID::fromString).toList();
     }
 
     log.info(
@@ -162,15 +164,21 @@ public class UserStateConsumer {
         return;
       }
 
-      // Create or update user calendars
+      // Create user calendars if they don't exist
       for (UUID calendarId : calendarIds) {
-        UserCalendar userCalendar =
-            userCalendarRepository
-                .findByCalendarId(calendarId)
-                .orElse(UserCalendar.builder().calendarId(calendarId).userId(userId).build());
-
-        userCalendarRepository.save(userCalendar);
-        log.info("User calendar added: {}", userCalendar);
+        // Check if this user-calendar association already exists
+        if (!userCalendarRepository.existsByCalendarIdAndUserId(calendarId, userId)) {
+          // Create a new user-calendar association
+          UserCalendar userCalendar =
+              UserCalendar.builder().calendarId(calendarId).userId(userId).build();
+          userCalendarRepository.save(userCalendar);
+          log.info("User calendar added: {}", userCalendar);
+        } else {
+          log.info(
+              "User calendar already exists for user ID: {} and calendar ID: {}",
+              userId,
+              calendarId);
+        }
       }
     } else if (eventType == EventType.CALENDAR_REMOVED) {
       // Remove calendars that are no longer associated with the user
