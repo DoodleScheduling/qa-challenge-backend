@@ -12,66 +12,68 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
 import org.springframework.util.backoff.ExponentialBackOff;
 
-/**
- * Configuration class for Kafka.
- */
+/** Configuration class for Kafka. */
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfig {
 
-    @Value("${kafka.topics.user-state}")
-    private String userStateTopic;
+  @Value("${kafka.topics.user-state}")
+  private String userStateTopic;
 
-    @Value("${spring.retry.kafka.max-attempts}")
-    private int maxAttempts;
+  @Value("${spring.retry.kafka.max-attempts}")
+  private int maxAttempts;
 
-    @Value("${spring.retry.kafka.initial-interval}")
-    private long initialInterval;
+  @Value("${spring.retry.kafka.initial-interval}")
+  private long initialInterval;
 
-    @Value("${spring.retry.kafka.multiplier}")
-    private double multiplier;
+  @Value("${spring.retry.kafka.multiplier}")
+  private double multiplier;
 
-    @Value("${spring.retry.kafka.max-interval}")
-    private long maxInterval;
+  @Value("${spring.retry.kafka.max-interval}")
+  private long maxInterval;
 
-    private final ConsumerFactory<String, Object> consumerFactory;
+  private final ConsumerFactory<String, Object> consumerFactory;
 
-    /**
-     * Creates a Kafka listener container factory with error handling.
-     *
-     * @return the Kafka listener container factory
-     */
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-        factory.setCommonErrorHandler(errorHandler());
-        factory.getContainerProperties().setAckMode(org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-        return factory;
-    }
+  /**
+   * Creates a Kafka listener container factory with error handling.
+   *
+   * @return the Kafka listener container factory
+   */
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, Object> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(consumerFactory);
+    factory.setCommonErrorHandler(errorHandler());
+    factory
+        .getContainerProperties()
+        .setAckMode(
+            org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+    return factory;
+  }
 
-    /**
-     * Creates a topic for user state events.
-     *
-     * @return the user state topic
-     */
-    @Bean
-    public NewTopic userStateTopic() {
-        return TopicBuilder.name(userStateTopic).partitions(3).replicas(1).build();
-    }
+  /**
+   * Creates a topic for user state events.
+   *
+   * @return the user state topic
+   */
+  @Bean
+  public NewTopic userStateTopic() {
+    return TopicBuilder.name(userStateTopic).partitions(3).replicas(1).build();
+  }
 
-    /**
-     * Creates an error handler for Kafka listeners.
-     *
-     * @return the error handler
-     */
-    @Bean
-    public DefaultErrorHandler errorHandler() {
-        ExponentialBackOff backOff = new ExponentialBackOffWithMaxRetries(maxAttempts);
-        backOff.setInitialInterval(initialInterval);
-        backOff.setMultiplier(multiplier);
-        backOff.setMaxInterval(maxInterval);
+  /**
+   * Creates an error handler for Kafka listeners.
+   *
+   * @return the error handler
+   */
+  @Bean
+  public DefaultErrorHandler errorHandler() {
+    ExponentialBackOff backOff = new ExponentialBackOffWithMaxRetries(maxAttempts);
+    backOff.setInitialInterval(initialInterval);
+    backOff.setMultiplier(multiplier);
+    backOff.setMaxInterval(maxInterval);
 
-        return new DefaultErrorHandler(backOff);
-    }
+    return new DefaultErrorHandler(backOff);
+  }
 }

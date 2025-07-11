@@ -4,6 +4,7 @@ import com.example.svcuser.avro.EventType;
 import doodle.qa.com.svcuserqa.dto.UserDto;
 import doodle.qa.com.svcuserqa.entity.User;
 import doodle.qa.com.svcuserqa.exception.CalendarAlreadyExistsException;
+import doodle.qa.com.svcuserqa.exception.CalendarLimitExceededException;
 import doodle.qa.com.svcuserqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcuserqa.exception.ConcurrentModificationException;
 import doodle.qa.com.svcuserqa.exception.UserNotFoundException;
@@ -258,6 +259,8 @@ public class UserService {
    * @return UserDto for the updated user
    * @throws UserNotFoundException if user not found
    * @throws CalendarAlreadyExistsException if the calendar is already added to the user
+   * @throws CalendarLimitExceededException if the user has reached the maximum limit of 10
+   *     calendars
    * @throws ConcurrentModificationException if the user was modified concurrently
    */
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -282,6 +285,13 @@ public class UserService {
       if (user.getCalendarIds().contains(calendarId)) {
         log.warn("Calendar {} is already associated with user {}", calendarId, userId);
         throw new CalendarAlreadyExistsException("This calendar is already associated.");
+      }
+
+      // Check if user has reached the maximum limit of 10 calendars
+      if (user.getCalendarIds().size() >= 10) {
+        log.warn("User {} has reached the maximum limit of 10 calendars", userId);
+        throw new CalendarLimitExceededException(
+            "Maximum limit of 10 calendars per user has been reached.");
       }
 
       user.getCalendarIds().add(calendarId);

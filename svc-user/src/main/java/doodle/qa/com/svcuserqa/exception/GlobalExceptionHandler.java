@@ -125,6 +125,21 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
   }
 
+  /**
+   * Handles CalendarLimitExceededException. Returns a 400 Bad Request status code.
+   *
+   * @param ex the exception
+   * @return the response entity with error details
+   */
+  @ExceptionHandler(CalendarLimitExceededException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleCalendarLimitExceededException(
+      CalendarLimitExceededException ex) {
+    ErrorResponse errorResponse =
+        new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now());
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
