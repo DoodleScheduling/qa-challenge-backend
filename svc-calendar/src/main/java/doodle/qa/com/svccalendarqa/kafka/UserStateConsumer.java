@@ -91,7 +91,7 @@ public class UserStateConsumer {
           calendarIds.size());
     } else {
       log.info("No calendar IDs provided for user ID: {}", userId);
-      return; // Skip processing if no calendar IDs are provided
+      calendarIds = new ArrayList<>(); // Initialize empty list to remove all calendars
     }
 
     // Create or update user calendars
