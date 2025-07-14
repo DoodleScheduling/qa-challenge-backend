@@ -72,6 +72,10 @@ The challenge is to write an automated regression test suite for the `svc-user` 
 
 Use all available documentation (Swagger, service source code, and README files) to determine the test scenarios and flows you want to cover.
 
+### Bonus Points
+
+If you have spare time, it would be great to see some load tests as well. This will help us understand your approach to performance testing.
+
 ## How to Provide Task Result
 
 1.  Create a private GitHub repository and push the provided code as an initial commit.
