@@ -222,7 +222,7 @@ public class MeetingService {
 
     Meeting savedMeeting = meetingRepository.save(meeting);
 
-    return mapToDto(meeting);
+    return mapToDto(savedMeeting);
   }
 
   /**
@@ -266,7 +266,7 @@ public class MeetingService {
     meeting.setLocation(meetingDto.getLocation());
 
     Meeting savedMeeting = meetingRepository.save(meeting);
-    return mapToDto(meeting);
+    return mapToDto(savedMeeting);
   }
 
   /**
