@@ -2,7 +2,6 @@ package doodle.qa.com.svccalendarqa.controller;
 
 import doodle.qa.com.svccalendarqa.dto.MeetingDto;
 import doodle.qa.com.svccalendarqa.dto.TimeSlotDto;
-import doodle.qa.com.svccalendarqa.entity.Meeting;
 import doodle.qa.com.svccalendarqa.service.MeetingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -75,7 +74,7 @@ public class MeetingController {
         "Getting meetings for user {} and calendar {} from {} to {}", userId, calendarId, from, to);
 
     Pageable pageable = PageRequest.of(page, size);
-    Page<Meeting> meetings = meetingService.findMeetings(userId, calendarId, from, to, pageable);
+    Page<MeetingDto> meetings = meetingService.findMeetings(userId, calendarId, from, to, pageable);
 
     Map<String, Object> response = new HashMap<>();
     response.put("meetings", meetings.getContent());

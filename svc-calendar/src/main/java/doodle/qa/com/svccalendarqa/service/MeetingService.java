@@ -5,9 +5,11 @@ import doodle.qa.com.svccalendarqa.dto.TimeSlotDto;
 import doodle.qa.com.svccalendarqa.entity.Meeting;
 import doodle.qa.com.svccalendarqa.entity.UserCalendar;
 import doodle.qa.com.svccalendarqa.exception.CalendarNotFoundException;
+import doodle.qa.com.svccalendarqa.exception.IllegalArgumentException;
 import doodle.qa.com.svccalendarqa.exception.MeetingNotFoundException;
 import doodle.qa.com.svccalendarqa.repository.MeetingRepository;
 import doodle.qa.com.svccalendarqa.repository.UserCalendarRepository;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -16,7 +18,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,7 +62,7 @@ public class MeetingService {
    * @return a page of meetings
    */
   @Transactional(readOnly = true)
-  public Page<Meeting> findMeetings(
+  public Page<MeetingDto> findMeetings(
       @NotNull UUID userId,
       @NotNull UUID calendarId,
       @NotNull LocalDateTime from,
@@ -75,9 +76,11 @@ public class MeetingService {
     validateTimeRange(from, to);
 
     // Find meetings
-    return meetingRepository
-        .findByUserCalendarAndStartTimeGreaterThanEqualAndEndTimeLessThanEqualOrderByStartTimeAsc(
-            userCalendar, from, to, pageable);
+    Page<Meeting> meetings =
+        meetingRepository
+            .findByUserCalendarAndStartTimeGreaterThanEqualAndEndTimeLessThanEqualOrderByStartTimeAsc(
+                userCalendar, from, to, pageable);
+    return meetings.map(this::mapToDto);
   }
 
   /**
@@ -105,12 +108,6 @@ public class MeetingService {
 
     // Validate time range
     validateTimeRange(from, to);
-
-    // Validate slot duration
-    if (slotDurationMinutes > MAX_SLOT_DURATION_HOURS * 60) {
-      throw new IllegalArgumentException(
-          "Slot duration cannot exceed " + MAX_SLOT_DURATION_HOURS + " hours");
-    }
 
     // Get busy slots from meetings
     List<Meeting> busyMeetings =
@@ -178,9 +175,10 @@ public class MeetingService {
     UserCalendar userCalendar = validateUserAndCalendar(userId, calendarId);
 
     // Find meeting
-    Meeting meeting = meetingRepository
-        .findByUserCalendarAndId(userCalendar, meetingId)
-        .orElseThrow(() -> new MeetingNotFoundException(meetingId, userId, calendarId));
+    Meeting meeting =
+        meetingRepository
+            .findByUserCalendarAndId(userCalendar, meetingId)
+            .orElseThrow(() -> new MeetingNotFoundException(meetingId, userId, calendarId));
 
     return mapToDto(meeting);
   }
@@ -194,9 +192,9 @@ public class MeetingService {
    */
   @Transactional
   @Retryable(
-      value = Exception.class,
+      value = OptimisticLockException.class,
       maxAttempts = 3,
-      backoff = @Backoff(delay = 1000, multiplier = 2))
+      backoff = @Backoff(delay = 500, multiplier = 2))
   public MeetingDto createMeeting(@Valid @NotNull MeetingDto meetingDto, @NotNull UUID userId) {
 
     UUID calendarId = meetingDto.getCalendarId();
@@ -237,9 +235,9 @@ public class MeetingService {
    */
   @Transactional
   @Retryable(
-      value = Exception.class,
+      value = OptimisticLockException.class,
       maxAttempts = 3,
-      backoff = @Backoff(delay = 1000, multiplier = 2))
+      backoff = @Backoff(delay = 500, multiplier = 2))
   public MeetingDto updateMeeting(
       @NotNull UUID meetingId, @Valid @NotNull MeetingDto meetingDto, @NotNull UUID userId) {
 
@@ -317,11 +315,12 @@ public class MeetingService {
    */
   private void validateTimeRange(LocalDateTime from, LocalDateTime to) {
     if (from.isAfter(to)) {
-      throw new IllegalArgumentException("Start time must be before end time");
+      throw new IllegalArgumentException(
+          "Start time {" + from + "} must be before end time {" + to + "}");
     }
 
-    long daysBetween = ChronoUnit.DAYS.between(from, to);
-    if (daysBetween > MAX_TIME_RANGE_DAYS) {
+    Duration duration = Duration.between(from, to).abs();
+    if (duration.compareTo(Duration.ofDays(MAX_TIME_RANGE_DAYS)) > 0) {
       throw new IllegalArgumentException(
           "Time range cannot exceed " + MAX_TIME_RANGE_DAYS + " days");
     }
@@ -337,11 +336,12 @@ public class MeetingService {
    */
   private void validateMeetingTime(LocalDateTime startTime, LocalDateTime endTime) {
     if (startTime.isAfter(endTime)) {
-      throw new IllegalArgumentException("Start time must be before end time");
+      throw new IllegalArgumentException(
+          "Start time {" + startTime + "} must be before end time {" + endTime + "}");
     }
 
-    long hoursBetween = ChronoUnit.HOURS.between(startTime, endTime);
-    if (hoursBetween > MAX_SLOT_DURATION_HOURS) {
+    Duration duration = Duration.between(startTime, endTime).abs();
+    if (duration.compareTo(Duration.ofHours(MAX_SLOT_DURATION_HOURS)) > 0) {
       throw new IllegalArgumentException(
           "Meeting duration cannot exceed " + MAX_SLOT_DURATION_HOURS + " hours");
     }
@@ -377,7 +377,7 @@ public class MeetingService {
         overlappingMeetings =
             overlappingMeetings.stream()
                 .filter(meeting -> !meeting.getId().equals(excludeMeetingId))
-                .collect(Collectors.toList());
+                .toList();
       }
 
       allOverlappingMeetings.addAll(overlappingMeetings);
@@ -411,7 +411,7 @@ public class MeetingService {
   @Retryable(
       value = Exception.class,
       maxAttempts = 3,
-      backoff = @Backoff(delay = 1000, multiplier = 2))
+      backoff = @Backoff(delay = 500, multiplier = 2))
   private List<Map<String, Object>> getExternalEvents(
       UUID calendarId, LocalDateTime from, LocalDateTime to) {
     try {

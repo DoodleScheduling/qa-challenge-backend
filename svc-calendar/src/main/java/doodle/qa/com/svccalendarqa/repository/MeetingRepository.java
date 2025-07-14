@@ -48,7 +48,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, UUID> {
    */
   @Query(
       "SELECT m FROM Meeting m WHERE m.userCalendar = :userCalendar AND "
-          + "((m.startTime <= :to AND m.endTime >= :from))")
+          + "((m.startTime < :to AND m.endTime > :from))")
   List<Meeting> findOverlappingMeetingsByUserCalendar(
       @Param("userCalendar") UserCalendar userCalendar,
       @Param("from") LocalDateTime from,
