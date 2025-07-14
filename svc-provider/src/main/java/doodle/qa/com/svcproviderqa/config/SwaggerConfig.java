@@ -17,8 +17,8 @@ public class SwaggerConfig {
     return new OpenAPI()
         .info(
             new Info()
-                .title("Calendar Provider Service API")
-                .description("API for managing calendars and events")
+                .title("Provider Service API")
+                .description("API for managing provider calendars and events")
                 .version("1.0.0")
                 .contact(
                     new Contact()

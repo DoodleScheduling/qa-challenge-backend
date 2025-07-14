@@ -1,7 +1,6 @@
 package doodle.qa.com.svccalendarqa.controller;
 
 import doodle.qa.com.svccalendarqa.dto.MeetingDto;
-import doodle.qa.com.svccalendarqa.dto.PageResponseDto;
 import doodle.qa.com.svccalendarqa.dto.TimeSlotDto;
 import doodle.qa.com.svccalendarqa.entity.Meeting;
 import doodle.qa.com.svccalendarqa.service.MeetingService;
@@ -12,7 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class MeetingController {
             description = "User or calendar not found",
             content = @Content)
       })
-  public ResponseEntity<PageResponseDto<Meeting>> getMeetings(
+  public ResponseEntity<Map<String, Object>> getMeetings(
       @Parameter(description = "User ID") @RequestParam UUID userId,
       @Parameter(description = "Calendar ID") @RequestParam UUID calendarId,
       @Parameter(description = "Start time")
@@ -77,7 +77,12 @@ public class MeetingController {
     Pageable pageable = PageRequest.of(page, size);
     Page<Meeting> meetings = meetingService.findMeetings(userId, calendarId, from, to, pageable);
 
-    return ResponseEntity.ok(PageResponseDto.from(meetings));
+    Map<String, Object> response = new HashMap<>();
+    response.put("meetings", meetings.getContent());
+    response.put("totalPages", meetings.getTotalPages());
+    response.put("currentPage", meetings.getNumber());
+
+    return ResponseEntity.ok(response);
   }
 
   /**
@@ -90,7 +95,7 @@ public class MeetingController {
    * @param slotDuration the slot duration in minutes
    * @param page the page number
    * @param size the page size
-   * @return a list of available time slots
+   * @return a page of available time slots with pagination information
    */
   @GetMapping("/slots")
   @Operation(
@@ -105,7 +110,7 @@ public class MeetingController {
             description = "User or calendar not found",
             content = @Content)
       })
-  public ResponseEntity<List<TimeSlotDto>> getAvailableTimeSlots(
+  public ResponseEntity<Map<String, Object>> getAvailableTimeSlots(
       @Parameter(description = "User ID") @RequestParam UUID userId,
       @Parameter(description = "Calendar ID") @RequestParam UUID calendarId,
       @Parameter(description = "Start time")
@@ -129,10 +134,15 @@ public class MeetingController {
         slotDuration);
 
     Pageable pageable = PageRequest.of(page, size);
-    List<TimeSlotDto> timeSlots =
+    Page<TimeSlotDto> timeSlots =
         meetingService.findAvailableTimeSlots(userId, calendarId, from, to, slotDuration, pageable);
 
-    return ResponseEntity.ok(timeSlots);
+    Map<String, Object> response = new HashMap<>();
+    response.put("slots", timeSlots.getContent());
+    response.put("totalPages", timeSlots.getTotalPages());
+    response.put("currentPage", timeSlots.getNumber());
+
+    return ResponseEntity.ok(response);
   }
 
   /**

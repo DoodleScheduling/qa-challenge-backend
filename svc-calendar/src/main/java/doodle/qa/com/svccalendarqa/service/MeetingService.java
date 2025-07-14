@@ -92,7 +92,7 @@ public class MeetingService {
    * @return a list of available time slots
    */
   @Transactional(readOnly = true)
-  public List<TimeSlotDto> findAvailableTimeSlots(
+  public Page<TimeSlotDto> findAvailableTimeSlots(
       @NotNull UUID userId,
       @NotNull UUID calendarId,
       @NotNull LocalDateTime from,
@@ -155,8 +155,11 @@ public class MeetingService {
     // Apply pagination
     int start = (int) pageable.getOffset();
     int end = Math.min((start + pageable.getPageSize()), availableSlots.size());
+    List<TimeSlotDto> paginatedSlots = availableSlots.subList(start, end);
 
-    return availableSlots.subList(start, end);
+    // Create a Page object
+    return new org.springframework.data.domain.PageImpl<>(
+        paginatedSlots, pageable, availableSlots.size());
   }
 
   /**
