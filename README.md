@@ -6,37 +6,7 @@ This project contains a set of microservices that work together to manage users,
 
 The system is composed of three main services: `svc-user`, `svc-calendar`, and `svc-provider`. They communicate with each other via REST APIs and asynchronously through Kafka.
 
-```mermaid
-graph TD
-    subgraph "External Systems"
-        Client["Client / API Gateway"]
-    end
-
-    subgraph "Shared Infrastructure"
-        Kafka
-        Database["PostgreSQL DB"]
-    end
-
-    subgraph "Microservices"
-        svc_user["svc-user"]
-        svc_calendar["svc-calendar"]
-        svc_provider["svc-provider"]
-    end
-
-    Client -- "HTTP Requests" --> svc_user
-    Client -- "HTTP Requests" --> svc_calendar
-    Client -- "HTTP Requests" --> svc_provider
-    
-    svc_user -- "Reads/Writes" --> Database
-    svc_calendar -- "Reads/Writes" --> Database
-    svc_provider -- "Reads/Writes" --> Database
-    
-    svc_user -- "Publishes user-state" --> Kafka
-    Kafka -- "Consumes user-state" --> svc_calendar
-    
-    svc_calendar -- "REST Call (get external events)" --> svc_provider
-
-```
+![Overall Architecture](images/overall-architecture.png)
 
 ### Services
 
