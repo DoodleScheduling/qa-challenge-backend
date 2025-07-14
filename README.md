@@ -1,97 +1,51 @@
-# User Service QA
+# QA Backend Challenge Services
 
-A user microservice for managing user data and calendar associations used as a backend for QA challenge.
+This project contains a set of microservices that work together to manage users, calendars, and events.
 
-## Quick Start
+## Overall Architecture
 
-### Prerequisites
+The system is composed of three main services: `svc-user`, `svc-calendar`, and `svc-provider`. They communicate with each other via REST APIs and asynchronously through Kafka.
 
-- Java 17+
-- Docker and Docker Compose
-- Maven
+![Overall Architecture](images/overall-architecture.png)
 
-### Running the Application
+### Services
 
-1. **Start Dependencies**:
-   ```bash
-   docker-compose up -d
-   ```
-   This starts PostgreSQL, Kafka, Zookeeper, and Schema Registry.
+-   **[svc-user](./svc-user/README.md)**: Manages users and their associated calendars. It publishes user state changes to a Kafka topic.
+-   **[svc-provider](./svc-provider/README.md)**: Manages calendars and events from external providers. This service is consumed by `svc-calendar` to fetch external events.
+-   **[svc-calendar](./svc-calendar/README.md)**: Manages meetings and calendar events. It consumes user data from Kafka to stay synchronized and fetches external event data from `svc-provider` to handle conflicts.
 
-2. **Build and Run**:
-   ```bash
-   mvn clean package
-   java -jar target/svc-user-qa-0.0.1-SNAPSHOT.jar
-   ```
+## How to Run
 
-   Or simply:
-   ```bash
-   mvn spring-boot:run
-   ```
+1.  **Start Dependencies**:
+    Make sure you have Docker and Docker Compose installed, then run:
+    ```bash
+    docker-compose up -d
+    ```
+    This command starts the required infrastructure: PostgreSQL, Kafka, Zookeeper, and Schema Registry.
+
+2.  **Run the Services**:
+    Each service can be run independently using Maven. To run a specific service, navigate to its directory and execute:
+    ```bash
+    # For example, to run svc-user
+    cd svc-user
+    mvn spring-boot:run
+    ```
 
 ## Testing
 
-### Run Tests
-   ```bash
-   mvn clean test
-   ```
-
-## Configuration
-
-Key configuration properties (environment variables):
-
-| Variable | Description | Default |
-|----------|-------------|----------|
-| `SPRING_DATASOURCE_URL` | Database URL | jdbc:postgresql://localhost:5432/userdb |
-| `SPRING_DATASOURCE_USERNAME` | Database username | postgres |
-| `SPRING_DATASOURCE_PASSWORD` | Database password | postgres |
-| `KAFKA_BOOTSTRAP_SERVERS` | Kafka bootstrap servers | localhost:9093 |
-
-## API Documentation
-
-Once running, access the API documentation at:
-
+To run the tests for all services, you can run the following command from the root directory:
+```bash
+mvn clean test
 ```
-# Swagger UI
-http://localhost:8080/swagger-ui.html
-
-# OpenAPI JSON
-http://localhost:8080/api-docs
-```
-
-The API includes these main endpoints:
-- `GET /api/users` - Get all users
-- `GET /api/users/{id}` - Get user by ID
-- `POST /api/users` - Create user
-- `PUT /api/users/{id}` - Update user
-- `DELETE /api/users/{id}` - Delete user
-- `POST /api/users/{userId}/calendars/{calendarId}` - Add calendar to user
-- `DELETE /api/users/{userId}/calendars/{calendarId}` - Remove calendar from user
 
 ## Accessing Admin Tools
 
-### Database Access
-
-You can connect to the PostgreSQL database using any PostgreSQL client:
-```
-Host: localhost
-Port: 5432
-Database: userdb
-Username: postgres
-Password: postgres
-```
-
-### Kafka UI
-
-Monitor Kafka topics and messages via Kafka UI:
-```
-http://localhost:8090
-```
-
-### Schema Registry UI
-
-View and manage Avro schemas:
-```
-http://localhost:8001
-```
+-   **Kafka UI**: [http://localhost:8090](http://localhost:8090)
+-   **Schema Registry UI**: [http://localhost:8001](http://localhost:8001)
+-   **Database (PostgreSQL)**:
+    -   **Host**: `localhost`
+    -   **Port**: `5432`
+    -   **Username**: `postgres`
+    -   **Password**: `postgres`
+    -   **Databases**: `userdb`, `calendardb`, `providerdb`
 

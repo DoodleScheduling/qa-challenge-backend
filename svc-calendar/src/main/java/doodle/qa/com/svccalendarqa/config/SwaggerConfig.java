@@ -1,4 +1,4 @@
-package doodle.qa.com.svcproviderqa.config;
+package doodle.qa.com.svccalendarqa.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
   @Bean
-  public OpenAPI providerServiceOpenAPI() {
+  public OpenAPI userServiceOpenAPI() {
     return new OpenAPI()
         .info(
             new Info()
-                .title("Provider Service API")
-                .description("API for managing provider calendars and events")
+                .title("Calendar Service API")
+                .description("API for fetching and managing meetings")
                 .version("1.0.0")
                 .contact(
                     new Contact()

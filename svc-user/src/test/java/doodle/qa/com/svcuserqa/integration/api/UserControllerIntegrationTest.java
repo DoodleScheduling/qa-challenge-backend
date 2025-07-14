@@ -158,6 +158,34 @@ class UserControllerIntegrationTest {
   }
 
   @Test
+  @DisplayName("Should return 400 when adding a calendar to a user who already has 10 calendars")
+  void testAddCalendarWhenUserHasMaxCalendars() throws Exception {
+    // Given
+    UserDto userDto =
+        TestDataFactory.createUserDto("Max Calendar User", "max-calendar@example.com");
+    UserDto createdUser = userService.createUser(userDto);
+    UUID userId = createdUser.getId();
+
+    // Add 10 calendars to the user
+    for (int i = 0; i < 10; i++) {
+      UUID calendarId = UUID.randomUUID();
+      mockMvc
+          .perform(post("/api/users/{userId}/calendars/{calendarId}", userId, calendarId))
+          .andExpect(status().isOk());
+    }
+
+    // When/Then - Try to add an 11th calendar
+    UUID extraCalendarId = UUID.randomUUID();
+    mockMvc
+        .perform(post("/api/users/{userId}/calendars/{calendarId}", userId, extraCalendarId))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.status", is(400)))
+        .andExpect(jsonPath("$.message", containsString("Maximum limit of 10 calendars")))
+        .andExpect(jsonPath("$.timestamp").exists());
+  }
+
+  @Test
   @DisplayName("Should return 404 when removing a calendar that doesn't exist")
   void testRemoveNonExistentCalendar() throws Exception {
     // Given

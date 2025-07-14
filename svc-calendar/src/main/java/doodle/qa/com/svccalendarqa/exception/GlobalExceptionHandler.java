@@ -1,4 +1,4 @@
-package doodle.qa.com.svcuserqa.exception;
+package doodle.qa.com.svccalendarqa.exception;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,17 +18,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Slf4j
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(UserNotFoundException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
-    ErrorResponse errorResponse =
-        new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            ex.getMessage(), // Safe to expose since it's a domain-specific exception
-            LocalDateTime.now());
-    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-  }
-
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<Map<String, String>> handleValidationExceptions(
@@ -43,31 +32,6 @@ public class GlobalExceptionHandler {
               errors.put(fieldName, errorMessage);
             });
     return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-  }
-
-  /**
-   * Handles ConcurrentModificationException. Returns a 409 Conflict status code with a generic
-   * conflict message.
-   *
-   * @param ex the exception
-   * @return the response entity with error details
-   */
-  @ExceptionHandler(ConcurrentModificationException.class)
-  @ResponseStatus(HttpStatus.CONFLICT)
-  public ResponseEntity<ErrorResponse> handleConcurrentModificationException(
-      ConcurrentModificationException ex) {
-    String errorId = UUID.randomUUID().toString();
-    // Log the full exception with errorId for tracking
-    log.error("Error ID: {} - Concurrent modification error: {}", errorId, ex.getMessage(), ex);
-
-    ErrorResponse errorResponse =
-        new ErrorResponse(
-            HttpStatus.CONFLICT.value(),
-            "The resource was modified by another request. Please refresh and try again. (Error ID: "
-                + errorId
-                + ")",
-            LocalDateTime.now());
-    return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
   }
 
   /**
@@ -96,21 +60,6 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles CalendarAlreadyExistsException. Returns a 409 Conflict status code.
-   *
-   * @param ex the exception
-   * @return the response entity with error details
-   */
-  @ExceptionHandler(CalendarAlreadyExistsException.class)
-  @ResponseStatus(HttpStatus.CONFLICT)
-  public ResponseEntity<ErrorResponse> handleCalendarAlreadyExistsException(
-      CalendarAlreadyExistsException ex) {
-    ErrorResponse errorResponse =
-        new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage(), LocalDateTime.now());
-    return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
-  }
-
-  /**
    * Handles CalendarNotFoundException. Returns a 404 Not Found status code.
    *
    * @param ex the exception
@@ -126,18 +75,31 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles CalendarLimitExceededException. Returns a 400 Bad Request status code.
+   * Handles MeetingNotFoundException. Returns a 404 Not Found status code.
    *
    * @param ex the exception
    * @return the response entity with error details
    */
-  @ExceptionHandler(CalendarLimitExceededException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseEntity<ErrorResponse> handleCalendarLimitExceededException(
-      CalendarLimitExceededException ex) {
+  @ExceptionHandler(MeetingNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseEntity<ErrorResponse> handleMeetingNotFoundException(MeetingNotFoundException ex) {
     ErrorResponse errorResponse =
-        new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now());
-    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now());
+    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+  }
+
+  /**
+   * Handles IllegalArgumentException. Returns a 409 Conflict.
+   *
+   * @param ex the exception
+   * @return the response entity with error details
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+    ErrorResponse errorResponse =
+        new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage(), LocalDateTime.now());
+    return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(Exception.class)

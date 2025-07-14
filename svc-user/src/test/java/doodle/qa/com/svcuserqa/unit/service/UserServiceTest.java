@@ -9,6 +9,7 @@ import com.example.svcuser.avro.EventType;
 import doodle.qa.com.svcuserqa.dto.UserDto;
 import doodle.qa.com.svcuserqa.entity.User;
 import doodle.qa.com.svcuserqa.exception.CalendarAlreadyExistsException;
+import doodle.qa.com.svcuserqa.exception.CalendarLimitExceededException;
 import doodle.qa.com.svcuserqa.exception.CalendarNotFoundException;
 import doodle.qa.com.svcuserqa.exception.UserNotFoundException;
 import doodle.qa.com.svcuserqa.kafka.UserStateProducer;
@@ -234,6 +235,34 @@ class UserServiceTest {
     assertThrows(
         CalendarAlreadyExistsException.class,
         () -> userService.addCalendarToUser(userId, calendarId));
+
+    verify(userRepository).findById(userId);
+    verify(userRepository, never()).save(any(User.class));
+    verify(userStateProducer, never()).sendUserState(any(User.class), any(EventType.class));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when user has reached the maximum limit of 10 calendars")
+  void addCalendarToUser_WhenUserHasMaxCalendars_ShouldThrowCalendarLimitExceededException() {
+    // Given
+    UUID userId = UUID.randomUUID();
+    UUID newCalendarId = UUID.randomUUID();
+
+    // Create a list of 10 calendar IDs
+    List<UUID> existingCalendarIds = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      existingCalendarIds.add(UUID.randomUUID());
+    }
+
+    User existingUser =
+        TestDataFactory.createUser(userId, "User", "user@example.com", existingCalendarIds);
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+    // When/Then
+    assertThrows(
+        CalendarLimitExceededException.class,
+        () -> userService.addCalendarToUser(userId, newCalendarId));
 
     verify(userRepository).findById(userId);
     verify(userRepository, never()).save(any(User.class));
