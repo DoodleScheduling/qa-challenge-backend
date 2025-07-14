@@ -44,12 +44,19 @@ public class Meeting {
   @Column private String location;
 
   /**
-   * Calendar ID for this meeting. This is a foreign key to the UserCalendar entity's calendarId
-   * field. This is the primary way to associate meetings with user calendars.
+   * Calendar ID for this meeting. This is a foreign key to the UserCalendar entity's id field. This
+   * is the primary way to associate meetings with user calendars.
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "calendar_id", referencedColumnName = "calendar_id", nullable = false)
+  @JoinColumn(name = "user_calendar_id", referencedColumnName = "id", nullable = false)
   private UserCalendar userCalendar;
+
+  /**
+   * Calendar ID for this meeting. This is a duplicate of the UserCalendar entity's calendarId
+   * field, stored for performance reasons.
+   */
+  @Column(name = "calendar_id", nullable = false)
+  private UUID calendarId;
 
   /**
    * Version field for optimistic locking. This helps prevent concurrent modifications by detecting

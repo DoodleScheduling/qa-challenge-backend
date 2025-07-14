@@ -165,14 +165,14 @@ public class MeetingController {
             description = "Meeting, user, or calendar not found",
             content = @Content)
       })
-  public ResponseEntity<Meeting> getMeeting(
+  public ResponseEntity<MeetingDto> getMeeting(
       @Parameter(description = "Meeting ID") @PathVariable UUID id,
       @Parameter(description = "User ID") @RequestParam UUID userId,
       @Parameter(description = "Calendar ID") @RequestParam UUID calendarId) {
 
     log.info("Getting meeting {} for user {} and calendar {}", id, userId, calendarId);
 
-    Meeting meeting = meetingService.findMeeting(id, userId, calendarId);
+    MeetingDto meeting = meetingService.findMeeting(id, userId, calendarId);
 
     return ResponseEntity.ok(meeting);
   }
@@ -196,13 +196,13 @@ public class MeetingController {
             description = "User or calendar not found",
             content = @Content)
       })
-  public ResponseEntity<Meeting> createMeeting(
+  public ResponseEntity<MeetingDto> createMeeting(
       @Parameter(description = "Meeting DTO") @Valid @RequestBody MeetingDto meetingDto,
       @Parameter(description = "User ID") @RequestParam UUID userId) {
 
     log.info("Creating meeting for user {}", userId);
 
-    Meeting meeting = meetingService.createMeeting(meetingDto, userId);
+    MeetingDto meeting = meetingService.createMeeting(meetingDto, userId);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(meeting);
   }
@@ -227,14 +227,14 @@ public class MeetingController {
             description = "Meeting, user, or calendar not found",
             content = @Content)
       })
-  public ResponseEntity<Meeting> updateMeeting(
+  public ResponseEntity<MeetingDto> updateMeeting(
       @Parameter(description = "Meeting ID") @PathVariable UUID id,
       @Parameter(description = "Meeting DTO") @Valid @RequestBody MeetingDto meetingDto,
       @Parameter(description = "User ID") @RequestParam UUID userId) {
 
     log.info("Updating meeting {} for user {}", id, userId);
 
-    Meeting meeting = meetingService.updateMeeting(id, meetingDto, userId);
+    MeetingDto meeting = meetingService.updateMeeting(id, meetingDto, userId);
 
     return ResponseEntity.ok(meeting);
   }

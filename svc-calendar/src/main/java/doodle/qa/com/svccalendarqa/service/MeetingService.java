@@ -171,16 +171,18 @@ public class MeetingService {
    * @return the meeting
    */
   @Transactional(readOnly = true)
-  public Meeting findMeeting(
+  public MeetingDto findMeeting(
       @NotNull UUID meetingId, @NotNull UUID userId, @NotNull UUID calendarId) {
 
     // Validate user and calendar
     UserCalendar userCalendar = validateUserAndCalendar(userId, calendarId);
 
     // Find meeting
-    return meetingRepository
+    Meeting meeting = meetingRepository
         .findByUserCalendarAndId(userCalendar, meetingId)
         .orElseThrow(() -> new MeetingNotFoundException(meetingId, userId, calendarId));
+
+    return mapToDto(meeting);
   }
 
   /**
@@ -195,7 +197,7 @@ public class MeetingService {
       value = Exception.class,
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2))
-  public Meeting createMeeting(@Valid @NotNull MeetingDto meetingDto, @NotNull UUID userId) {
+  public MeetingDto createMeeting(@Valid @NotNull MeetingDto meetingDto, @NotNull UUID userId) {
 
     UUID calendarId = meetingDto.getCalendarId();
 
@@ -217,9 +219,12 @@ public class MeetingService {
             .endTime(meetingDto.getEndTime())
             .location(meetingDto.getLocation())
             .userCalendar(userCalendar)
+            .calendarId(calendarId)
             .build();
 
-    return meetingRepository.save(meeting);
+    Meeting savedMeeting = meetingRepository.save(meeting);
+
+    return mapToDto(meeting);
   }
 
   /**
@@ -235,7 +240,7 @@ public class MeetingService {
       value = Exception.class,
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2))
-  public Meeting updateMeeting(
+  public MeetingDto updateMeeting(
       @NotNull UUID meetingId, @Valid @NotNull MeetingDto meetingDto, @NotNull UUID userId) {
 
     UUID calendarId = meetingDto.getCalendarId();
@@ -262,7 +267,8 @@ public class MeetingService {
     meeting.setEndTime(meetingDto.getEndTime());
     meeting.setLocation(meetingDto.getLocation());
 
-    return meetingRepository.save(meeting);
+    Meeting savedMeeting = meetingRepository.save(meeting);
+    return mapToDto(meeting);
   }
 
   /**
@@ -490,5 +496,21 @@ public class MeetingService {
     }
 
     return availableSlots;
+  }
+
+  private MeetingDto mapToDto(Meeting meeting) {
+    if (meeting == null) {
+      return null;
+    }
+
+    return MeetingDto.builder()
+        .title(meeting.getTitle())
+        .description(meeting.getDescription())
+        .startTime(meeting.getStartTime())
+        .endTime(meeting.getEndTime())
+        .location(meeting.getLocation())
+        .calendarId(meeting.getCalendarId())
+        .id(meeting.getId())
+        .build();
   }
 }

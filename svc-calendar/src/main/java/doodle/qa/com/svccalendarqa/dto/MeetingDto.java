@@ -32,8 +32,4 @@ public class MeetingDto {
 
   @NotNull(message = "Calendar ID is required")
   private UUID calendarId;
-
-  private LocalDateTime createdAt;
-
-  private LocalDateTime updatedAt;
 }
