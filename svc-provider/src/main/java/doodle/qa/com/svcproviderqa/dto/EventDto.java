@@ -38,5 +38,6 @@ public class EventDto {
    */
   @JsonIgnore private Long version;
 
+  @NotNull(message = "Calendar ID is required")
   private UUID calendarId;
 }
