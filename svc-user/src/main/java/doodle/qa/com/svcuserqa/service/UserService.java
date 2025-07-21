@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +99,7 @@ public class UserService {
     // Check if a user with the same email already exists
     if (userRepository.existsByEmail(userDto.getEmail())) {
       log.warn("User with email {} already exists", userDto.getEmail());
-      throw new ConcurrentModificationException(
+      throw new DataIntegrityViolationException(
           "A user with this email already exists. Please use a different email.");
     }
 
