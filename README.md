@@ -75,6 +75,7 @@ Use all available documentation (Swagger, service source code, and README files)
 ### Bonus Points
 
 If you have spare time, it would be great to see some load tests as well. This will help us understand your approach to performance testing.
+> You can use any framework you feel comfortable for the load test part.
 
 ## How to Provide Task Result
 
