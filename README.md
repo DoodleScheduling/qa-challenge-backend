@@ -83,5 +83,3 @@ If you have spare time, it would be great to see some load tests as well. This w
 2.  Add a `tests` folder in the root path, where you will place your solution.
 3.  The solution must include a `README.md` file with instructions on how to execute your tests and your conclusions on any bugs found or improvement suggestions. We want to see your thought process.
 4.  Finally, send us the link to your repository and share it with the account(s) specified in the email from your interviewer.
-
-> **To finish the challenge, you can take up to 7 hours in the following 7 days. We trust you to be fair.**
